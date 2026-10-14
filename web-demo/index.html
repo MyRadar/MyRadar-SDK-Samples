@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>MyRadar Flight Tracker</title>
+    <link rel="icon" type="image/svg+xml" href="/src/assets/myradar-icon.svg" />
+  </head>
+  <body>
+    <div class="accent-bar" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-logo" src="/src/assets/myradar-logo.svg" alt="MyRadar" width="144" height="32" />
+        <div class="brand-sub">Live flight tracker</div>
+      </div>
+      <form id="search" class="search" role="search" autocomplete="off">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z" /></svg>
+        <input id="search-input" type="search" placeholder="Flight number, e.g. AA 1643, or tail number" aria-label="Flight number or tail number" spellcheck="false" />
+        <button type="submit">Track</button>
+      </form>
+      <div class="clock">
+        <div id="clock-time" class="clock-time"></div>
+        <div id="clock-date" class="clock-date"></div>
+      </div>
+    </header>
+
+    <main class="app">
+      <div class="map-column">
+        <section class="map-card">
+          <div id="map" role="application" aria-label="Map"></div>
+          <div class="map-overlay live-pill" id="live-pill" hidden><span class="live-dot"></span><b>LIVE</b> <span id="live-updated"></span></div>
+          <div class="map-overlay map-legend">
+            <div class="legend-row"><span class="legend-line solid"></span>Actual track flown</div>
+            <div class="legend-row"><span class="legend-line dashed"></span>Planned route · ahead</div>
+            <div class="legend-row"><span class="legend-line dashed faint"></span>Planned route · already flown</div>
+            <div class="legend-scale"><span>Rain</span><span>Storms</span></div>
+            <div class="legend-bar"></div>
+          </div>
+          <div class="map-overlay map-credit" id="map-credit"><img src="/src/assets/myradar-icon.svg" alt="" width="14" height="14" />Weather by MyRadar</div>
+        </section>
+      </div>
+
+      <aside class="side" id="side">
+        <section class="card" id="flight-card"></section>
+        <section class="card" id="details-card" hidden></section>
+        <section class="card layers-card">
+          <div class="eyebrow">Map layers</div>
+          <div id="layer-control"></div>
+          <div id="time-slider" class="time-slider"></div>
+          <p class="data-credit">Flight data from Flightradar24</p>
+        </section>
+      </aside>
+
+      <section class="card timeline-card" id="timeline-card" hidden></section>
+    </main>
+    <div id="toast" class="toast" hidden></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

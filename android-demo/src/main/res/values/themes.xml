@@ -1,0 +1,7 @@
+<resources>
+    <!-- Window theme only; the UI is Compose with Material 3 (see DemoTheme). -->
+    <style name="Theme.MyRadarSDKDemo" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

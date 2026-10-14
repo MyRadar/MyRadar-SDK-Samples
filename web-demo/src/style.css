@@ -1,0 +1,870 @@
+:root {
+  --bg: #eef1f5;
+  --card: #ffffff;
+  --fg: #1b2330;
+  --muted: #5d6678;
+  --faint: #8a93a3;
+  --line: #e2e6ed;
+  --accent: #0b6fd6;
+  --accent-soft: rgba(11, 111, 214, 0.1);
+  --alert: #d01f2e;
+  --done: #15803d;
+  --map-bg: #111a26;
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 15px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint {
+  color: var(--muted);
+  margin: 12px 0 0;
+  line-height: 1.45;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Header */
+
+.accent-bar {
+  height: 8px;
+  background: linear-gradient(105deg, var(--accent) 0 70%, #fff 70% 70.6%, var(--alert) 70.6% 85%, #fff 85% 85.6%, #a7afbb 85.6%);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 14px 28px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+
+.brand-sub {
+  color: var(--muted);
+  font-size: 17px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+}
+
+.search {
+  flex: 1 1 360px;
+  max-width: 560px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 4px 4px 14px;
+}
+
+.search:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: var(--card);
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+  fill: var(--faint);
+  flex: none;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: var(--fg);
+  outline: none;
+  padding: 6px 0;
+}
+
+.search button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.clock {
+  margin-left: auto;
+  text-align: right;
+}
+
+.clock-time {
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Layout */
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 460px);
+  grid-template-areas:
+    'map side'
+    'timeline timeline';
+  gap: 20px;
+  padding: 20px 28px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 26px;
+}
+
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Map */
+
+/* spans only the top row, so the sticky map can't slide over the timeline below */
+.map-column {
+  grid-area: map;
+  min-width: 0;
+}
+
+.map-card {
+  /* sized to the window, not the side column, and kept in view while the cards scroll past */
+  position: sticky;
+  top: 20px;
+  height: clamp(480px, calc(100vh - 150px), 900px);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--map-bg);
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+.map-overlay {
+  position: absolute;
+  z-index: 2;
+  color: #e8edf5;
+  font-size: 13px;
+}
+
+.live-pill {
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(10, 16, 26, 0.82);
+  letter-spacing: 0.04em;
+}
+
+.live-pill span:last-child {
+  color: #aab4c4;
+  letter-spacing: 0;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+  animation: pulse 2s infinite;
+}
+
+.live-pill.stale .live-dot {
+  background: #9aa3b5;
+  animation: none;
+}
+
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 8px rgba(52, 211, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+
+/* Map layers card */
+
+.layers-card #layer-control {
+  margin-top: 14px;
+}
+
+.mrc.mrc-light {
+  --mrc-bg: transparent;
+  --mrc-accent: var(--accent);
+  --mrc-fg: var(--fg);
+  --mrc-muted: var(--muted);
+  --mrc-border: var(--line);
+}
+
+/* the white "lightning flashes" swatch needs an edge on a white card */
+.layers-card .mrc-layer-swatch {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+.time-slider {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.data-credit {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.map-legend {
+  left: 16px;
+  bottom: 40px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(10, 16, 26, 0.82);
+  min-width: 230px;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.legend-line {
+  width: 36px;
+  height: 0;
+  border-top: 3px solid #fff;
+}
+
+.legend-line.dashed {
+  border-top: 3px dashed #4da3ff;
+}
+
+.legend-line.faint {
+  border-top-width: 2px;
+  opacity: 0.55;
+}
+
+.legend-scale {
+  display: flex;
+  justify-content: space-between;
+  color: #aab4c4;
+  font-size: 12px;
+  margin-top: 14px;
+}
+
+.legend-bar {
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #0ecf8a, #02fd02, #fdf802, #fd8a00, #fd0000, #f800fd);
+}
+
+.map-credit {
+  right: 16px;
+  bottom: 54px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 999px;
+  background: rgba(10, 16, 26, 0.82);
+  font-size: 11px;
+}
+
+.map-credit img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.mapboxgl-ctrl-bottom-right .mapboxgl-ctrl-scale {
+  background: rgba(10, 16, 26, 0.82);
+  color: #e8edf5;
+  border-color: #e8edf5;
+}
+
+/* Markers drawn by FlightTracker */
+
+.map-plane {
+  position: relative;
+  width: 46px;
+  height: 46px;
+}
+
+.map-plane-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(77, 163, 255, 0.9);
+  background: rgba(17, 26, 38, 0.55);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.map-plane-icon svg {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+.map-plane.stale .map-plane-icon {
+  border-color: #9aa3b5;
+  color: #c9d0db;
+}
+
+.map-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: rgba(10, 16, 26, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #dfe5ee;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.map-label b {
+  color: #fff;
+  margin-right: 4px;
+}
+
+.map-plane-label {
+  left: 56px;
+}
+
+.map-airport {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(11, 111, 214, 0.45);
+}
+
+.map-airport-label.left {
+  right: 24px;
+}
+
+.map-airport-label.right {
+  left: 24px;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Flight card */
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.pill svg {
+  width: 17px;
+  height: 17px;
+}
+
+.pill-air {
+  background: var(--accent);
+}
+
+.pill-done {
+  background: var(--done);
+}
+
+.pill-muted {
+  background: #6b7484;
+}
+
+.pill-alert {
+  background: var(--alert);
+}
+
+.title {
+  margin: 12px 0 0;
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.lede {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.flight-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.flight-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.flight-arrival {
+  text-align: right;
+  flex: none;
+}
+
+.big-time {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.small {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.progress-labels b {
+  color: var(--fg);
+}
+
+.progress-pct {
+  text-align: center;
+}
+
+.progress {
+  position: relative;
+  height: 8px;
+  margin: 12px 0 4px;
+  border-radius: 4px;
+  background: #e3e7ee;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+  transition: width 0.6s ease;
+}
+
+.progress-knob {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent);
+  transform: translate(-50%, -50%);
+  transition: left 0.6s ease;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.stats > div {
+  padding: 0 12px;
+  border-left: 1px solid var(--line);
+}
+
+.stats > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.stats .eyebrow {
+  font-size: 11px;
+}
+
+.stat {
+  margin-top: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+button.chip {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.chip:hover {
+  border-color: #c4cad4;
+}
+
+button.chip[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Suggestions and search choices */
+
+.suggest-title {
+  margin-top: 22px;
+}
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.suggestion {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  grid-template-areas:
+    'flight route'
+    'flight type';
+  column-gap: 12px;
+  align-items: center;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  font: inherit;
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.suggestion-flight {
+  grid-area: flight;
+  font-weight: 700;
+}
+
+.suggestion-route {
+  grid-area: route;
+}
+
+.suggestion-type {
+  grid-area: type;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Details card */
+
+.facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  margin: 14px 0 0;
+}
+
+.facts div {
+  min-width: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.facts .alert {
+  color: var(--alert);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Timeline */
+
+.timeline-card {
+  grid-area: timeline;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.timeline-intro {
+  flex: 0 0 220px;
+}
+
+.timeline-intro p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.timeline {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--steps), 1fr);
+}
+
+.timeline-track {
+  position: absolute;
+  left: var(--inset);
+  right: var(--inset);
+  top: 38px;
+  border-top: 2px dashed #c4cad4;
+}
+
+.timeline-fill {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.step-label {
+  font-size: 17px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.step-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #4a5263;
+}
+
+.step.done .step-dot,
+.step.now .step-dot {
+  border: 3px solid var(--accent);
+  box-shadow: inset 0 0 0 3px #fff;
+  background: var(--accent);
+}
+
+.step-time {
+  font-size: 19px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.step.now .step-label,
+.step.now .step-time {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+
+.toast {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(180, 40, 40, 0.94);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  z-index: 10;
+  max-width: calc(100vw - 32px);
+}
+
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'map'
+      'side'
+      'timeline';
+  }
+
+  .map-card {
+    position: relative;
+    top: auto;
+    height: 460px;
+  }
+
+  .timeline-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .timeline-intro {
+    flex: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .brand-sub,
+  .clock-date {
+    display: none;
+  }
+
+  .app {
+    padding: 12px;
+  }
+
+  .flight-main {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .flight-arrival {
+    text-align: left;
+    margin-top: 12px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 12px;
+  }
+
+  .stats > div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .step-label {
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .step-time {
+    font-size: 15px;
+  }
+
+  .map-legend {
+    display: none;
+  }
+}

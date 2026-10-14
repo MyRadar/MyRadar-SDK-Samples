@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+
+# Secrets / local config
+.env
+.env.local
+.env.*.local
+local.properties
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+xcuserdata/
+*.xcuserstate
+
+# Web
+node_modules/
+dist/
+*.log
+
+# Android / Gradle
+build/
+.gradle/
+.kotlin/
+.cxx/
+captures/
+
+# Xcode
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
