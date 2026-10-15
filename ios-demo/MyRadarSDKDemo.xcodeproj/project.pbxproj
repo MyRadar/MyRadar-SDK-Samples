@@ -7,31 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		34AEDC59301B416B006F2A1F /* MyRadar_iOS_SDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AEDC57301B416B006F2A1F /* MyRadar_iOS_SDK.framework */; };
-		34AEDC5A301B416B006F2A1F /* MyRadar_iOS_SDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34AEDC57301B416B006F2A1F /* MyRadar_iOS_SDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34AEDC5B301B416B006F2A1F /* Tectonic.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AEDC58301B416B006F2A1F /* Tectonic.framework */; };
-		34AEDC5C301B416B006F2A1F /* Tectonic.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34AEDC58301B416B006F2A1F /* Tectonic.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34AEDC59301B416B006F2A1F /* MyRadarSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 34AEDC5E301B416B006F2A1F /* MyRadarSDK */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		34AEDC5D301B416B006F2A1F /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				34AEDC5A301B416B006F2A1F /* MyRadar_iOS_SDK.framework in Embed Frameworks */,
-				34AEDC5C301B416B006F2A1F /* Tectonic.framework in Embed Frameworks */,
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		34AEDBF6301B3D1B006F2A1F /* MyRadarSDKDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyRadarSDKDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		34AEDC57301B416B006F2A1F /* MyRadar_iOS_SDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MyRadar_iOS_SDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		34AEDC58301B416B006F2A1F /* Tectonic.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Tectonic.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -47,8 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34AEDC59301B416B006F2A1F /* MyRadar_iOS_SDK.framework in Frameworks */,
-				34AEDC5B301B416B006F2A1F /* Tectonic.framework in Frameworks */,
+				34AEDC59301B416B006F2A1F /* MyRadarSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,7 +38,6 @@
 			isa = PBXGroup;
 			children = (
 				34AEDBF8301B3D1B006F2A1F /* MyRadarSDKDemo */,
-				34AEDC56301B416B006F2A1F /* Frameworks */,
 				34AEDBF7301B3D1B006F2A1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -72,15 +50,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		34AEDC56301B416B006F2A1F /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				34AEDC57301B416B006F2A1F /* MyRadar_iOS_SDK.framework */,
-				34AEDC58301B416B006F2A1F /* Tectonic.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -91,7 +60,6 @@
 				34AEDBF2301B3D1B006F2A1F /* Sources */,
 				34AEDBF3301B3D1B006F2A1F /* Frameworks */,
 				34AEDBF4301B3D1B006F2A1F /* Resources */,
-				34AEDC5D301B416B006F2A1F /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -102,6 +70,7 @@
 			);
 			name = MyRadarSDKDemo;
 			packageProductDependencies = (
+				34AEDC5E301B416B006F2A1F /* MyRadarSDK */,
 			);
 			productName = MyRadarSDKDemo;
 			productReference = 34AEDBF6301B3D1B006F2A1F /* MyRadarSDKDemo.app */;
@@ -131,6 +100,9 @@
 			);
 			mainGroup = 34AEDBED301B3D1B006F2A1F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				34AEDC5F301B416B006F2A1F /* XCRemoteSwiftPackageReference "MyRadar-iOS-SDK-SPM" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 34AEDBF7301B3D1B006F2A1F /* Products */;
 			projectDirPath = "";
@@ -365,6 +337,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		34AEDC5F301B416B006F2A1F /* XCRemoteSwiftPackageReference "MyRadar-iOS-SDK-SPM" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ACMEAtronOmatic/MyRadar-iOS-SDK-SPM";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		34AEDC5E301B416B006F2A1F /* MyRadarSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 34AEDC5F301B416B006F2A1F /* XCRemoteSwiftPackageReference "MyRadar-iOS-SDK-SPM" */;
+			productName = MyRadarSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 34AEDBEE301B3D1B006F2A1F /* Project object */;
 }
