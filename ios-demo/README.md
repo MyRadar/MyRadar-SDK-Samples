@@ -10,18 +10,31 @@ keeps the camera on the aircraft at a regional zoom or fits the whole route.
 ## Requirements
 
 - Xcode 16 or later.
-- An iPhone or iPad simulator or device.
-- A MyRadar API key.
+- An iPhone or iPad simulator or device running iOS 17 or later.
+- A MyRadar API key from the [developer portal](https://myradar.com/developer_portal).
 
 ## Setup
 
-1. Open `MyRadarSDKDemo.xcodeproj`. Xcode resolves the **MyRadarSDK** Swift package from
-   `https://github.com/ACMEAtronOmatic/MyRadar-iOS-SDK-SPM`.
-2. Add your API key: **Product > Scheme > Edit Scheme… > Run > Arguments > Environment Variables**,
-   name `MYRADAR_API_KEY`. Don't commit the scheme with the key in it (Xcode keeps it in your
-   `xcuserdata`, which is git-ignored).
-3. Pick a simulator or device and run. For a device, set your signing team on the
-   **MyRadarSDKDemo** target first.
+1. Open `MyRadarSDKDemo.xcodeproj`. On first open Xcode downloads the **MyRadarSDK** Swift
+   package (about 40 MB) from `https://github.com/MyRadar/MyRadar-iOS-SDK-SPM`; wait for it to
+   appear under **Package Dependencies**.
+2. Add your API key to the scheme:
+   1. **Product > Scheme > Edit Scheme…** (⌘<).
+   2. Select **Run**, then the **Arguments** tab.
+   3. Under **Environment Variables**, click **+**. Name: `MYRADAR_API_KEY`. Value: your key.
+
+   Leave **Shared** unchecked at the bottom of the scheme editor so the key stays in your
+   `xcuserdata`, which is git-ignored. Alternatively set `localAPIKey` in
+   `MyRadarSDKDemo/DemoSecrets.swift`, and don't commit it.
+3. Pick a simulator and press ⌘R. For a device, set your signing team and a bundle identifier of
+   your own on the **MyRadarSDKDemo** target first.
+
+Radar and warnings should appear within a few seconds. All weather data comes through the MyRadar
+API gateway, so if the base map shows but radar and warnings never do, the key is missing or was
+rejected. `[MyRadarSDK] No API key` in Xcode's console means the app received no key (check the
+variable name and its checkbox); otherwise check the key for stray spaces or quotes. The
+environment variable is passed only when Xcode launches the app, so run with ⌘R rather than from
+the home screen.
 
 How the SDK is wired in, as in any third-party app:
 

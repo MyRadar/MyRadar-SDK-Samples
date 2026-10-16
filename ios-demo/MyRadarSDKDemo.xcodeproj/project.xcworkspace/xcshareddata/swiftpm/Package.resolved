@@ -1,0 +1,15 @@
+{
+  "originHash" : "f836c7be155d1f4842b372f54c7bdeda5294f79c3c7e40de2d3a7540b68bb1f6",
+  "pins" : [
+    {
+      "identity" : "myradar-ios-sdk-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MyRadar/MyRadar-iOS-SDK-SPM",
+      "state" : {
+        "revision" : "677c2faa06b02e6310c5a3495b54302cd60525a0",
+        "version" : "1.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -16,7 +16,7 @@ enum DemoSecrets {
     /// Fill in locally if you prefer not to use the environment variable. Keep it out of git.
     private static let localAPIKey: String? = nil
 
-    /// The key to use, or `nil` to run against the data hosts directly.
+    /// The key to use, or `nil` if none is set (the map then shows no weather).
     static var apiKey: String? {
         if let fromEnvironment = ProcessInfo.processInfo.environment["MYRADAR_API_KEY"],
            !fromEnvironment.isEmpty {

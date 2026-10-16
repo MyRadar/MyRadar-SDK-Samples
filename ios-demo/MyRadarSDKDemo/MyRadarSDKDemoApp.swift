@@ -10,8 +10,8 @@ import MyRadar_iOS_SDK
 struct MyRadarSDKDemoApp: App {
 
     init() {
-        // Route weather data through the MyRadar API gateway when a key is available.
-        // Without a key the SDK talks to the data hosts directly.
+        // Weather data comes from the MyRadar API gateway, which needs your key.
+        // Without one the map shows the base map only.
         if let apiKey = DemoSecrets.apiKey {
             MyRadarSDK.configure(apiKey: apiKey)
         }
