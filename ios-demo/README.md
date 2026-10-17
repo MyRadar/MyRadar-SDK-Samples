@@ -27,7 +27,6 @@ cd MyRadar-SDK-Samples/ios-demo
 SIM="iPhone 16"
 UDID=$(xcrun simctl list devices available | grep -m1 "    $SIM (" | grep -oE '[0-9A-F-]{36}')
 xcrun simctl boot "$UDID" 2>/dev/null || true
-open -a Simulator || true
 
 xcodebuild -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo \
   -destination "id=$UDID" -derivedDataPath build \
@@ -36,16 +35,20 @@ xcodebuild -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo \
 xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/MyRadarSDKDemo.app
 SIMCTL_CHILD_MYRADAR_API_KEY="$MYRADAR_API_KEY" \
   xcrun simctl launch "$UDID" com.myradar.MyRadarSDKDemo
+open -a Simulator --args -CurrentDeviceUDID "$UDID" 2>/dev/null ||
+  open -b com.apple.dt.Devices --args -CurrentDeviceUDID "$UDID"
 ```
 
 `SIM` can be any iOS 17 or later simulator; `xcrun simctl list devices available` lists them.
-Booting a simulator that is already running is fine, and `open -a Simulator` shows its window.
+Booting a simulator that is already running is fine. The last command brings up the
+simulator's window: in the Simulator app, or in Device Hub in newer versions of Xcode,
+which replaces it. The app runs either way; without that window you just can't see it.
 The first build downloads the `MyRadarSDK` package, so it takes a few minutes.
 `-packageAuthorizationProvider netrc` stops `xcodebuild` from waiting on a
 Keychain prompt for GitHub credentials, which the public package doesn't need.
-The key reaches the app through the last command (`SIMCTL_CHILD_` passes an
-environment variable to the launched app), so start the app with that command
-again rather than from the simulator's home screen.
+The key reaches the app through the `xcrun simctl launch` command (`SIMCTL_CHILD_`
+passes an environment variable to the launched app), so start the app with that
+command again rather than from the simulator's home screen.
 
 ## Setup
 
