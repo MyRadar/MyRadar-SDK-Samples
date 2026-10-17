@@ -4,6 +4,24 @@ A single-flight tracker built on `@myradar/mapbox` and `@myradar/controls`: sear
 follow it live over MyRadar weather (radar, wind, hurricanes, watches and warnings, and lightning
 strikes and flashes, each switchable).
 
+## Quickstart (command line)
+
+With [Node.js](https://nodejs.org) 20.19 or later, these commands clone the
+sample, install it, write your keys to `.env.local` and start the dev server.
+Replace `your-myradar-api-key` and `pk.your-mapbox-token`.
+
+```sh
+export MYRADAR_API_KEY=your-myradar-api-key
+export MAPBOX_TOKEN=pk.your-mapbox-token
+git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
+cd MyRadar-SDK-Samples/web-demo
+npm install
+printf 'VITE_MYRADAR_API_KEY=%s\nVITE_MAPBOX_TOKEN=%s\n' "$MYRADAR_API_KEY" "$MAPBOX_TOKEN" > .env.local
+npm run dev    # then open http://localhost:5173
+```
+
+`.env.local` is git-ignored. Restart `npm run dev` after changing it.
+
 ## Run it
 
 You need [Node.js](https://nodejs.org) 20.19 or later, a MyRadar API key from the

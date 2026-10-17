@@ -30,7 +30,7 @@ the same file, as `VITE_MAPBOX_TOKEN`.
 git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
 ```
 
-then follow the README in the sample's folder. In short:
+then follow the README in the sample's folder; each starts with a command-line quickstart. In short:
 
 - **iOS:** open `ios-demo/MyRadarSDKDemo.xcodeproj` in Xcode 16 or later, wait for the
   **MyRadarSDK** package to resolve, add the key to the scheme, and run on an iOS 17+ simulator.

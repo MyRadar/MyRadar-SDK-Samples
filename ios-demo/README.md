@@ -13,10 +13,43 @@ keeps the camera on the aircraft at a regional zoom or fits the whole route.
 - An iPhone or iPad simulator or device running iOS 17 or later.
 - A MyRadar API key from the [developer portal](https://myradar.com/developer_portal).
 
+## Quickstart (command line)
+
+On a Mac with Xcode 16 or later, these commands clone the sample, build it and
+launch it on a simulator with your key. Replace `your-myradar-api-key`, and set
+`SIM` to any iOS 17 or later simulator from `xcrun simctl list devices available`.
+
+```sh
+export MYRADAR_API_KEY=your-myradar-api-key
+git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
+cd MyRadar-SDK-Samples/ios-demo
+
+# Any iOS 17+ simulator; list them with: xcrun simctl list devices available
+SIM="iPhone 16"
+UDID=$(xcrun simctl list devices available | grep -m1 "    $SIM (" | grep -oE '[0-9A-F-]{36}')
+xcrun simctl boot "$UDID" 2>/dev/null || true   # already booted is fine
+open -a Simulator || true                       # show the Simulator window
+
+xcodebuild -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo \
+  -destination "id=$UDID" -derivedDataPath build \
+  -packageAuthorizationProvider netrc -quiet build
+
+xcrun simctl install "$UDID" build/Build/Products/Debug-iphonesimulator/MyRadarSDKDemo.app
+SIMCTL_CHILD_MYRADAR_API_KEY="$MYRADAR_API_KEY" \
+  xcrun simctl launch "$UDID" com.myradar.MyRadarSDKDemo
+```
+
+The first build downloads the `MyRadarSDK` package, so it takes a few minutes.
+`-packageAuthorizationProvider netrc` stops `xcodebuild` from waiting on a
+Keychain prompt for GitHub credentials, which the public package doesn't need.
+The key reaches the app through the last command (`SIMCTL_CHILD_` passes an
+environment variable to the launched app), so start the app with that command
+again rather than from the simulator's home screen.
+
 ## Setup
 
 1. Open `MyRadarSDKDemo.xcodeproj`. On first open Xcode downloads the **MyRadarSDK** Swift
-   package (about 40 MB) from `https://github.com/MyRadar/MyRadar-iOS-SDK-SPM`; wait for it to
+   package (about 5 MB) from `https://github.com/MyRadar/MyRadar-iOS-SDK-SPM`; wait for it to
    appear under **Package Dependencies**.
 2. Add your API key to the scheme:
    1. **Product > Scheme > Edit Scheme…** (⌘<).

@@ -18,6 +18,40 @@ route.
 The SDK comes from the MyRadar SDK Maven repository (`https://myradar.github.io/MyRadar-Android-SDK-Maven`); Gradle
 downloads it, so there is nothing else to install.
 
+## Quickstart (command line)
+
+With Android Studio installed, these commands clone the sample, start an
+emulator, and build and launch the app with your key. Replace
+`your-myradar-api-key`. The paths are Android Studio's defaults on macOS; on
+Linux the SDK is usually in `~/Android/Sdk`, and any JDK 17 or later works for
+`JAVA_HOME`.
+
+```sh
+export MYRADAR_API_KEY=your-myradar-api-key
+git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
+cd MyRadar-SDK-Samples/android-demo
+
+# Android Studio's SDK and bundled JDK (macOS paths; any JDK 17+ works)
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
+
+# Start the first emulator (create one in Android Studio's Device Manager if this list is empty)
+emulator -list-avds
+AVD=$(emulator -list-avds | head -1)
+emulator -avd "$AVD" -cores 4 >/dev/null 2>&1 &
+adb wait-for-device
+until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1 ]; do sleep 2; done
+
+./gradlew :app:installDebug   # reads MYRADAR_API_KEY
+adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity
+```
+
+The build reads `MYRADAR_API_KEY` from the environment and builds it into the
+app, so after changing the key, run `./gradlew :app:installDebug` again. The
+first build downloads Gradle, the Android build tools and the MyRadar SDK, so it
+takes a few minutes.
+
 ## Setup
 
 1. Clone the samples repository:
