@@ -42,10 +42,14 @@ adb wait-for-device
 until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1 ]; do sleep 2; done
 
 ./gradlew :app:installDebug
-adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity
+adb shell input keyevent KEYCODE_WAKEUP
+adb shell wm dismiss-keyguard
+adb shell am start -S -n com.acmeaom.myradar.sdkdemo/.MainActivity
 ```
 
-`emulator -list-avds` lists your emulators and the commands start the first one; if
+The last three commands wake the emulator's screen and restart the app. An emulator that
+resumes from Quick Boot can come back with its screen asleep, which looks like a blank
+screen. `emulator -list-avds` lists your emulators and the commands start the first one; if
 the list is empty, create one in Android Studio's Device Manager first. The build
 reads `MYRADAR_API_KEY` from the environment and builds it into the app, so after
 changing the key, run `./gradlew :app:installDebug` again. The
