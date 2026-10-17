@@ -3,7 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { HurricanesLayer, LightningLayer, RadarLayer, WarningsLayer, WindLayer, firstSymbolLayerId } from '@myradar/mapbox';
 import { LayerControl, TimeSlider, weatherLayerItems } from '@myradar/controls';
 import { NM_TO_MI, aircraftTypeName, type Aircraft } from './geo';
-import { INITIAL_VIEW, MAPBOX_TOKEN, MAP_STYLE, MYRADAR_API_KEY, MYRADAR_PROXY_HOST } from './config';
+import { INITIAL_VIEW, MAPBOX_TOKEN, MAP_STYLE, MYRADAR_API_KEY } from './config';
 import { FlightTracker, flightLabel, type FlightPhase, type TrackedFlight } from './flights';
 import { normalizeQuery, searchFlight, suggestFlights, type SearchResult, type Suggestion } from './search';
 import './style.css';
@@ -65,10 +65,8 @@ const common = { apiKey, debug };
 const radar = new RadarLayer({ ...common, product: 'radar', palette: 'dark', opacity: 0.7, playing: false });
 const wind = new WindLayer({ ...common, visible: false });
 const hurricanes = new HurricanesLayer(common);
-// Overlays whose gateway operations lack CORS headers are fetched through the dev-server proxy.
-const proxied = params.has('direct') ? common : { ...common, host: MYRADAR_PROXY_HOST };
-const warnings = new WarningsLayer({ ...proxied, visible: false });
-const lightning = new LightningLayer(proxied);
+const warnings = new WarningsLayer({ ...common, visible: false });
+const lightning = new LightningLayer(common);
 lightning.attachRadar(radar);
 const flights = new FlightTracker(map);
 

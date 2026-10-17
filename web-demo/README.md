@@ -4,15 +4,47 @@ A single-flight tracker built on `@myradar/mapbox` and `@myradar/controls`: sear
 follow it live over MyRadar weather (radar, wind, hurricanes, watches and warnings, and lightning
 strikes and flashes, each switchable).
 
-```sh
-cd web-demo
-cp .env.example .env.local   # then fill in your keys (see below)
-npm install
-npm run dev                  # http://localhost:5173
-```
+## Run it
 
-`@myradar/mapbox` and `@myradar/controls` are the MyRadar web SDK packages; the demo expects them to
-be installable from your package registry.
+You need [Node.js](https://nodejs.org) 20.19 or later, a MyRadar API key from the
+[developer portal](https://myradar.com/developer_portal), and a
+[Mapbox access token](https://account.mapbox.com/access-tokens/) (the default public token works).
+
+1. Get the code and install the packages, including the MyRadar web SDK (`@myradar/mapbox` and
+   `@myradar/controls`) from npm:
+
+   ```sh
+   git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
+   cd MyRadar-SDK-Samples/web-demo
+   npm install
+   ```
+
+2. Add your keys. Copy the template to `.env.local`, which git ignores:
+
+   ```sh
+   cp .env.example .env.local
+   ```
+
+   and replace the placeholders:
+
+   ```sh
+   VITE_MAPBOX_TOKEN=pk.your-mapbox-token
+   VITE_MYRADAR_API_KEY=your-myradar-sdk-api-key
+   ```
+
+   The demo passes the MyRadar key to the SDK as `apiKey` (see `src/config.ts` and `src/main.ts`),
+   and the SDK sends it with every request to the MyRadar API gateway.
+
+3. Start the dev server and open <http://localhost:5173>:
+
+   ```sh
+   npm run dev
+   ```
+
+Radar should start drawing within a few seconds. If the map shows but no radar or warnings, the
+MyRadar key is missing or was rejected: the page shows "No MyRadar API key" when it is missing,
+and the browser console shows `401` responses from `sdkwrapperapi.azure-api.net` when it was
+rejected. Restart `npm run dev` after editing `.env.local`.
 
 ## What it shows
 
@@ -55,21 +87,19 @@ from [OpenFlights](https://openflights.org/data.php), ODbL), loaded on first use
 
 ## Keys and proxies
 
-Copy `.env.example` to `.env.local` (git-ignored) and set `VITE_MAPBOX_TOKEN` and
-`VITE_MYRADAR_API_KEY`. Both can also be passed in the URL (`?token=...`, `?apiKey=...`).
+Keys come from `.env.local` (see [Run it](#run-it)) or the URL (`?token=...`, `?apiKey=...`).
 
-`vite.config.ts` proxies on the page's origin, for both `vite` and `vite preview`:
+MyRadar weather data comes straight from the MyRadar API gateway. The flight data services need
+same-origin proxies, which `vite.config.ts` sets up for both `vite` and `vite preview`:
 
 | Prefix | Target | Why |
 |---|---|---|
 | `/fr24` | `https://data-cloud.flightradar24.com` | CORS only allows flightradar24.com; the dev proxy drops the page's `Referer`, as FR24 answers 451 to `localhost` |
 | `/adsb-traces` | `https://adsb.lol` (recorded traces) | no CORS headers |
-| `/myradar-api` | the MyRadar SDK gateway | the alerts and lightning operations do not send CORS headers yet; `?direct` bypasses this |
 
-A deployment needs equivalent proxies (or routes for these hosts on the gateway).
+A deployment needs equivalent proxies.
 
 ## URL parameters
 
 `?flight=AA1643` searches for a flight on load (the page keeps it up to date, so the URL can be
-shared), `?token=pk....` Mapbox token, `?apiKey=...` MyRadar key, `?direct` to call the gateway directly
-for every overlay, `?debug` for console logs. The map position is kept in the URL hash.
+shared), `?token=pk....` Mapbox token, `?apiKey=...` MyRadar key, `?debug` for console logs. The map position is kept in the URL hash.
