@@ -18,10 +18,9 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-// The MyRadar Android SDK is distributed as a Maven repository: the `maven` folder of the unzipped
-// myradar-android-sdk-VERSION.zip, or the hosted repository URL you were given. Point
-// `myradar.sdkRepo` at it in local.properties (or pass -Pmyradar.sdkRepo=..., or set
-// MYRADAR_SDK_REPO).
+// The MyRadar Android SDK is published to a public Maven repository on GitHub Pages. To build against
+// another copy (for example a local SDK build's dist/maven folder), set `myradar.sdkRepo` in
+// local.properties, pass -Pmyradar.sdkRepo=..., or set MYRADAR_SDK_REPO.
 val localProperties = Properties().apply {
     val file = file("local.properties")
     if (file.exists()) file.inputStream().use(::load)
@@ -29,10 +28,7 @@ val localProperties = Properties().apply {
 val sdkRepo: String = providers.gradleProperty("myradar.sdkRepo").orNull
     ?: localProperties.getProperty("myradar.sdkRepo")
     ?: System.getenv("MYRADAR_SDK_REPO")
-    ?: error(
-        "MyRadar SDK repository not set. Unzip myradar-android-sdk-VERSION.zip and add " +
-            "myradar.sdkRepo=/path/to/myradar-android-sdk-VERSION/maven to local.properties.",
-    )
+    ?: "https://myradar.github.io/MyRadar-Android-SDK-Maven"
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

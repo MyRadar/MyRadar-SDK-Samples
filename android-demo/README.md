@@ -13,32 +13,48 @@ route.
 - Android Studio with the Android SDK for API 37 (the Gradle wrapper and JDK come with it).
 - A device or emulator running Android 10 (API 29) or later with OpenGL ES 3, on `arm64-v8a`,
   `armeabi-v7a` or `x86_64`. Emulators need at least 2 CPU cores.
-- The MyRadar Android SDK package (`myradar-android-sdk-VERSION.zip`) or the URL of a hosted
-  MyRadar SDK Maven repository.
-- A MyRadar API key.
+- A MyRadar API key from the [developer portal](https://myradar.com/developer_portal).
+
+The SDK comes from the MyRadar SDK Maven repository (`https://myradar.github.io/MyRadar-Android-SDK-Maven`); Gradle
+downloads it, so there is nothing else to install.
 
 ## Setup
 
-1. Unzip the SDK package anywhere, for example next to this repository.
-2. Create `local.properties` in this folder (it is git-ignored) with the SDK repository and your key:
-
-   ```properties
-   # The `maven` folder of the unzipped package, or the hosted repository URL.
-   myradar.sdkRepo=/path/to/myradar-android-sdk-1.0.0/maven
-   myradar.apiKey=<your key>
-   ```
-
-   Android Studio adds `sdk.dir` to this file on first open. Instead of `local.properties`, you can
-   set the `MYRADAR_SDK_REPO` and `MYRADAR_API_KEY` environment variables.
-3. If your package is not version 1.0.0, set `myradar.sdkVersion` in `gradle.properties`.
-4. Open this folder in Android Studio and run the **app** configuration, or:
+1. Clone the samples repository:
 
    ```sh
+   git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
+   ```
+
+2. Create `local.properties` in this folder (`android-demo`, next to `settings.gradle.kts`) with
+   your key:
+
+   ```properties
+   myradar.apiKey=your-myradar-api-key
+   ```
+
+   The file is git-ignored. At build time the key is copied into `BuildConfig.MYRADAR_API_KEY`,
+   which `DemoApplication` passes to `MyRadarSdk.configure`. Android Studio adds `sdk.dir` to the
+   same file on first open. Instead of the file, you can set the `MYRADAR_API_KEY` environment
+   variable.
+3. Open this folder in Android Studio (**File > Open**), let Gradle sync, and run the **app**
+   configuration on an emulator or device. Or, from a terminal with one running and
+   `ANDROID_HOME` set to your Android SDK (usually `~/Library/Android/sdk` on a Mac; opening the
+   project once in Android Studio writes it to `local.properties` instead):
+
+   ```sh
+   export ANDROID_HOME="$HOME/Library/Android/sdk"
    ./gradlew :app:installDebug
    ```
 
-Without an API key the app still builds, but the map shows a "MyRadar SDK is not configured"
-notice.
+Radar and warnings should appear within a few seconds. A "MyRadar SDK is not configured" notice
+means the app was built without a key: check the property name and folder, then build again (the
+key is read at build time). A map without weather means the key was rejected; run
+`adb shell setprop log.tag.MyRadarSDK VERBOSE` and `adb logcat -s MyRadarSDK` to see each request
+and its status code.
+
+To build against an unreleased SDK (for example a local SDK build's `dist/maven` folder), set
+`myradar.sdkRepo` in `local.properties` and `myradar.sdkVersion` in `gradle.properties`.
 
 How the SDK is wired in, as in any third-party app:
 
