@@ -322,6 +322,7 @@ struct ContentView: View {
         case .lightningFlashes: return "bolt.fill"
         case .hurricanes: return "hurricane"
         case .wind: return "wind"
+        @unknown default: return "square.3.layers.3d"
         }
     }
 

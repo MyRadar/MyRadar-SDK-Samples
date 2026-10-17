@@ -190,8 +190,10 @@ final class FlightTracker {
         rebuildGeometry()
         recenter()
 
-        // Enrich in the background; failures here just leave fields blank.
-        async let routeLookup = tracked.route == nil ? try? service.routes(for: [summary.state]) : nil
+        // Enrich in the background; failures here just leave fields blank. Decide on the main
+        // actor whether a route lookup is needed, so the concurrent lookups don't read `tracked`.
+        let needsRoute = tracked.route == nil
+        async let routeLookup = needsRoute ? try? service.routes(for: [summary.state]) : nil
         async let airlineLookup = try? service.airline(callsign: summary.state.callsign)
         async let trackLookup = try? service.track(hex: summary.state.hex)
         if let routes = await routeLookup {
