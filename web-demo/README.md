@@ -17,8 +17,10 @@ git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
 cd MyRadar-SDK-Samples/web-demo
 npm install
 printf 'VITE_MYRADAR_API_KEY=%s\nVITE_MAPBOX_TOKEN=%s\n' "$MYRADAR_API_KEY" "$MAPBOX_TOKEN" > .env.local
-npm run dev    # then open http://localhost:5173
+npm run dev
 ```
+
+Then open <http://localhost:5173>.
 
 `.env.local` is git-ignored. Restart `npm run dev` after changing it.
 

@@ -24,11 +24,10 @@ export MYRADAR_API_KEY=your-myradar-api-key
 git clone https://github.com/MyRadar/MyRadar-SDK-Samples.git
 cd MyRadar-SDK-Samples/ios-demo
 
-# Any iOS 17+ simulator; list them with: xcrun simctl list devices available
 SIM="iPhone 16"
 UDID=$(xcrun simctl list devices available | grep -m1 "    $SIM (" | grep -oE '[0-9A-F-]{36}')
-xcrun simctl boot "$UDID" 2>/dev/null || true   # already booted is fine
-open -a Simulator || true                       # show the Simulator window
+xcrun simctl boot "$UDID" 2>/dev/null || true
+open -a Simulator || true
 
 xcodebuild -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo \
   -destination "id=$UDID" -derivedDataPath build \
@@ -39,6 +38,8 @@ SIMCTL_CHILD_MYRADAR_API_KEY="$MYRADAR_API_KEY" \
   xcrun simctl launch "$UDID" com.myradar.MyRadarSDKDemo
 ```
 
+`SIM` can be any iOS 17 or later simulator; `xcrun simctl list devices available` lists them.
+Booting a simulator that is already running is fine, and `open -a Simulator` shows its window.
 The first build downloads the `MyRadarSDK` package, so it takes a few minutes.
 `-packageAuthorizationProvider netrc` stops `xcodebuild` from waiting on a
 Keychain prompt for GitHub credentials, which the public package doesn't need.
