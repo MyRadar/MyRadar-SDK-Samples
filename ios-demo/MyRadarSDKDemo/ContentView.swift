@@ -4,9 +4,8 @@
 //
 //  A one-screen flight tracker built on the MyRadar iOS SDK. Controls sit above
 //  the map, the map has its own panel, and the flight details card sits below.
-//  The SDK's polyline and marker APIs draw the flight path and aircraft over live
-//  radar, warnings and lightning. Flight data comes from free public ADS-B
-//  services (see FlightDataService.swift).
+//  The SDK's `.flight(_:)` modifier looks the flight up and draws it over live
+//  radar, warnings and lightning; the card shows the FlightInfo it reports.
 //
 
 import SwiftUI
@@ -14,7 +13,12 @@ import CoreLocation
 import MyRadar_iOS_SDK
 
 struct ContentView: View {
-    @State private var tracker = FlightTracker()
+    /// What the user typed, and the flight number the map shows.
+    @State private var searchText = ""
+    @State private var ident: String?
+    /// The flight as the SDK last reported it, and why it couldn't be shown.
+    @State private var flight: FlightInfo?
+    @State private var errorMessage: String?
     @State private var showAttributions = false
     @State private var tappedMarkerMessage: String?
     @FocusState private var searchFocused: Bool
@@ -160,8 +164,8 @@ struct ContentView: View {
     /// The flight card when tracking, otherwise the hint, plus attributions when shown.
     @ViewBuilder
     private var infoPanel: some View {
-        if let flight = tracker.flight {
-            FlightCardView(tracker: tracker, flight: flight, showAttributions: $showAttributions)
+        if let flight {
+            FlightCardView(flight: flight, onClose: stopTracking)
         } else {
             hint
         }
@@ -176,16 +180,14 @@ struct ContentView: View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
                 searchBar
+                layersMenu
                 Button {
-                    searchFocused = false
-                    Task { await tracker.loadSample() }
+                    withAnimation { showAttributions.toggle() }
                 } label: {
-                    Image(systemName: "airplane.circle")
+                    Image(systemName: "info.circle")
                         .font(.title2)
                 }
-                .accessibilityLabel("Load sample flight (offline)")
-                .help("Load a simulated San Francisco to New York flight that needs no network.")
-                layersMenu
+                .accessibilityLabel("Attributions")
                 Button {
                     withAnimation { showsOpacityControl.toggle() }
                 } label: {
@@ -198,10 +200,7 @@ struct ContentView: View {
             if showsOpacityControl {
                 opacityRow
             }
-            if !tracker.results.isEmpty {
-                resultsList
-            }
-            if let message = tracker.errorMessage {
+            if let message = errorMessage {
                 banner(message, systemImage: "exclamationmark.triangle")
             }
             if let message = tappedMarkerMessage {
@@ -215,20 +214,20 @@ struct ContentView: View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
-            TextField("Flight, airport or route", text: $tracker.searchText)
+            TextField("Flight number, e.g. UA 1", text: $searchText)
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
                 .focused($searchFocused)
                 .onSubmit {
                     searchFocused = false
-                    Task { await tracker.search() }
+                    track(searchText)
                 }
-            if tracker.isSearching {
+            if ident != nil && flight == nil && errorMessage == nil {
                 ProgressView()
-            } else if !tracker.searchText.isEmpty {
+            } else if !searchText.isEmpty {
                 Button {
-                    tracker.searchText = ""
+                    searchText = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
@@ -340,34 +339,6 @@ struct ContentView: View {
         )
     }
 
-    private var resultsList: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0) {
-                ForEach(tracker.results) { result in
-                    Button {
-                        searchFocused = false
-                        Task { await tracker.select(result) }
-                    } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(result.title)
-                                .font(.headline.monospaced())
-                            Text(result.subtitle)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                    }
-                    .buttonStyle(.plain)
-                    Divider()
-                }
-            }
-        }
-        .frame(maxHeight: 200)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
-    }
-
     private func banner(_ text: String, systemImage: String) -> some View {
         Label(text, systemImage: systemImage)
             .font(.footnote)
@@ -398,14 +369,37 @@ struct ContentView: View {
         }
         return view
             .polygons(showsFloodMock ? FloodMock.polygons(around: initialCenter) : [])
-            .polylines(tracker.polylines)
-            .markers(tracker.markers + (showsFloodMock ? FloodMock.markers(around: initialCenter) : []))
-            .visibleRegion(tracker.region)
-            .camera(tracker.camera)
+            .markers(showsFloodMock ? FloodMock.markers(around: initialCenter) : [])
             .onMarkerTap { marker in
-                tappedMarkerMessage = marker.userInfo["airport"] ?? marker.userInfo["callsign"]
-                    ?? marker.userInfo["depth"].map { "Water depth \($0)" }
+                tappedMarkerMessage = marker.userInfo["depth"].map { "Water depth \($0)" }
             }
+            // The SDK looks the flight up, draws it and updates it until it lands.
+            .flight(ident)
+            .onFlightUpdate { info in
+                flight = info
+                errorMessage = nil
+            }
+            .onFlightError { error in
+                // A failed update keeps the last data on the map; only a failed first load is shown.
+                if flight == nil { errorMessage = error.localizedDescription }
+            }
+    }
+
+    // MARK: - Tracking
+
+    private func track(_ text: String) {
+        let query = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return }
+        flight = nil
+        errorMessage = nil
+        ident = query
+    }
+
+    private func stopTracking() {
+        ident = nil
+        flight = nil
+        errorMessage = nil
+        searchText = ""
     }
 
 
@@ -415,7 +409,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Track a flight over live radar")
                 .font(.headline)
-            Text("Search by flight number (UA 1, DAL100), by airport (SFO, KJFK) to list arrivals and departures, or by route (SFO-LAX). The airplane button loads an offline sample flight. Tap a layer chip to turn it on or off; the layers button picks the base map and radar product.")
+            Text("Enter an airline flight number (UA 1, AA 1643) or a callsign (UAL1). Tap a layer chip to turn it on or off; the layers button picks the base map and radar product.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
         }
@@ -426,11 +420,8 @@ struct ContentView: View {
 
     private var attributionsCard: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Data attributions")
+            Text("Attributions")
                 .font(.footnote.bold())
-            Text("Flight positions, routes and airports: adsb.lol contributors (ODbL). Airline names: adsbdb.com. Flight times are estimates from distance and ground speed.")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
             Text("Map: " + MyRadarMapView.licensesAndAttributions.map(\.name).joined(separator: ", "))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -442,12 +433,10 @@ struct ContentView: View {
 
     // MARK: - Launch arguments
 
-    /// Test hooks: `--sample` loads the offline flight, `--query <text>` runs a search at
-    /// launch, `--zoom <level>` and `--center <lat>,<lon>` set the initial camera, and
-    /// `--overlays a,b,c` (names: warnings, lightning, flashes, hurricanes, wind, none)
-    /// sets the initial overlays.
+    /// Test hooks: `--query <flight number>` shows a flight at launch, `--zoom <level>` and
+    /// `--center <lat>,<lon>` set the initial camera, and `--overlays a,b,c` (names: warnings,
+    /// lightning, flashes, hurricanes, wind, none) sets the initial overlays.
     private func handleLaunchArguments() async {
-        let arguments = ProcessInfo.processInfo.arguments
         // `--style <gray|roads|aerial|topographic|dark|light>` picks the base map at launch.
         if let styleName = Self.launchArgument("--style")?.lowercased(),
            let style = MapStyle.allCases.first(where: { $0.displayName.lowercased() == styleName }) {
@@ -463,18 +452,9 @@ struct ContentView: View {
             if names.contains("wind") { selected.insert(.wind) }
             overlays = selected
         }
-        if arguments.contains("--sample") {
-            await tracker.loadSample()
-        } else if let index = arguments.firstIndex(of: "--query"), index + 1 < arguments.count {
-            tracker.searchText = arguments[index + 1]
-            await tracker.search()
-            if let first = tracker.results.first {
-                await tracker.select(first)
-            }
-        }
-        // `--route` starts in whole-route camera mode instead of following the aircraft.
-        if arguments.contains("--route") {
-            tracker.cameraMode = .wholeRoute
+        if let query = Self.launchArgument("--query") {
+            searchText = query
+            track(query)
         }
     }
 }

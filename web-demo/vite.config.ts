@@ -1,35 +1,8 @@
-import { defineConfig, type ProxyOptions } from 'vite';
+import { defineConfig } from 'vite';
 
-/**
- * Flightradar24's feed only sends CORS headers for flightradar24.com, and adsb.lol's trace files send
- * none, so the dev and preview servers proxy them on the page's origin. A deployment needs equivalent
- * proxies. MyRadar weather data comes straight from the MyRadar SDK gateway, which sends CORS headers.
- */
-const proxyTo = (target: string, prefix: string, headers?: Record<string, string>): ProxyOptions => ({
-  target,
-  changeOrigin: true,
-  secure: true,
-  headers,
-  rewrite: (path) => path.slice(prefix.length),
-});
-
-const proxy: Record<string, ProxyOptions> = {
-  // FR24 only allows https://www.flightradar24.com as a CORS origin, and answers 451 to requests
-  // referred from localhost, so the page's Referer and Origin aren't passed on.
-  '/fr24': {
-    ...proxyTo('https://data-cloud.flightradar24.com', '/fr24'),
-    configure: (proxy) => {
-      proxy.on('proxyReq', (req) => {
-        req.removeHeader('referer');
-        req.removeHeader('origin');
-      });
-    },
-  },
-  // recorded tracks; adsb.lol serves them to its own map
-  '/adsb-traces': proxyTo('https://adsb.lol', '/adsb-traces', { Referer: 'https://adsb.lol/' }),
-};
-
+// Everything the demo loads (weather and flights) comes from the MyRadar SDK gateway, which sends
+// CORS headers, so no proxies are needed.
 export default defineConfig({
-  server: { port: 5173, open: false, proxy },
-  preview: { port: 4173, proxy },
+  server: { port: 5173, open: false },
+  preview: { port: 4173 },
 });

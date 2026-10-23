@@ -14,10 +14,3 @@ export const MYRADAR_API_KEY = (import.meta.env.VITE_MYRADAR_API_KEY as string |
 
 /** Over the central US: plenty of flights and usually some weather. */
 export const INITIAL_VIEW = { center: [-89.5, 38.8] as [number, number], zoom: 5.3 };
-
-/** Same-origin prefixes proxied to Flightradar24's feed and adsb.lol's trace files (see `vite.config.ts`). */
-export const FR24_API = '/fr24';
-export const ADSB_TRACES = '/adsb-traces';
-
-/** How often the tracked flight's position is refreshed. */
-export const AIRCRAFT_POLL_MS = 6000;

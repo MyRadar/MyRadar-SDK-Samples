@@ -2,16 +2,15 @@
 //  FlightCardView.swift
 //  MyRadarSDKDemo
 //
-//  Compact card describing the tracked flight.
+//  Compact card describing the flight the map shows, built from the SDK's FlightInfo.
 //
 
 import SwiftUI
 import MyRadar_iOS_SDK
 
 struct FlightCardView: View {
-    let tracker: FlightTracker
-    let flight: TrackedFlight
-    @Binding var showAttributions: Bool
+    let flight: FlightInfo
+    let onClose: () -> Void
 
     private static let accent = Color(red: 0.15, green: 0.85, blue: 1.0)
 
@@ -20,7 +19,6 @@ struct FlightCardView: View {
             header
             routeRow
             statsRow
-            footer
         }
         .padding(12)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 16))
@@ -30,17 +28,10 @@ struct FlightCardView: View {
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            Text(flight.displayNumber)
+            Text(flight.ident)
                 .font(.title3.bold())
                 .lineLimit(1)
                 .fixedSize()
-            if flight.displayNumber != flight.state.callsign {
-                Text(flight.state.callsign)
-                    .font(.caption.monospaced())
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .fixedSize()
-            }
             Text(subtitle)
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -48,9 +39,7 @@ struct FlightCardView: View {
                 .layoutPriority(-1)
             Spacer(minLength: 4)
             statusBadge
-            Button {
-                tracker.clearFlight()
-            } label: {
+            Button(action: onClose) {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(.secondary)
             }
@@ -58,21 +47,19 @@ struct FlightCardView: View {
         }
     }
 
-    /// "MyRadar Air · Boeing 737-800 · N123MR"
+    /// "B789 · N61101 · En Route / On Time"
     private var subtitle: String {
-        [flight.airline?.name, flight.aircraftDescription]
+        [flight.aircraftType, flight.registration, flight.status.isEmpty ? nil : flight.status]
             .compactMap { $0 }
             .joined(separator: " · ")
     }
 
     private var statusBadge: some View {
         let (text, color): (String, Color) = {
-            if flight.state.onGround { return ("On ground", .orange) }
-            if let rate = flight.state.verticalRateFeetPerMinute {
-                if rate > 300 { return ("Climbing", .green) }
-                if rate < -300 { return ("Descending", .yellow) }
-            }
-            return ("En route", .green)
+            if flight.isCancelled { return ("Cancelled", .red) }
+            if flight.hasLanded { return ("Landed", .orange) }
+            if flight.isAirborne { return ("In the air", .green) }
+            return ("Scheduled", .secondary)
         }()
         return Text(text)
             .font(.caption2.bold())
@@ -84,27 +71,40 @@ struct FlightCardView: View {
 
     private var routeRow: some View {
         HStack(alignment: .center, spacing: 10) {
-            airportColumn(flight.route?.origin, time: tracker.departure?.date,
-                          isEstimate: tracker.departure?.isEstimate ?? true, alignment: .leading)
+            airportColumn(flight.origin, time: flight.actualDeparture ?? flight.scheduledDeparture,
+                          alignment: .leading)
             VStack(spacing: 3) {
-                ProgressView(value: tracker.progress ?? 0)
+                ProgressView(value: flight.hasLanded ? 1 : flight.progress ?? 0)
                     .tint(Self.accent)
-                Text(tracker.timeRemainingText.map { "\($0) to go" } ?? " ")
+                Text(progressCaption)
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(.secondary)
             }
-            airportColumn(flight.route?.destination, time: tracker.estimatedArrival, isEstimate: true,
+            airportColumn(flight.destination,
+                          time: flight.actualArrival ?? flight.estimatedArrival ?? flight.scheduledArrival,
                           alignment: .trailing)
         }
     }
 
-    private func airportColumn(_ airport: Airport?, time: Date?, isEstimate: Bool,
-                               alignment: HorizontalAlignment) -> some View {
+    /// "2 h 10 min to go", noting when the aircraft's position is estimated (common over oceans).
+    private var progressCaption: String {
+        let parts = [timeToGo.map { "\($0) to go" },
+                     flight.isAirborne && flight.position?.isEstimated == true ? "estimated position" : nil]
+        let text = parts.compactMap { $0 }.joined(separator: " · ")
+        return text.isEmpty ? " " : text
+    }
+
+    private var timeToGo: String? {
+        guard flight.isAirborne, let arrival = flight.estimatedArrival else { return nil }
+        let minutes = max(0, Int(arrival.timeIntervalSinceNow / 60))
+        return minutes < 60 ? "\(minutes) min" : "\(minutes / 60) h \(minutes % 60) min"
+    }
+
+    private func airportColumn(_ airport: FlightAirport?, time: Date?, alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 1) {
-            Text(airport?.displayCode ?? "—")
+            Text(airport?.code ?? "—")
                 .font(.title3.bold())
-            Text(time.map { (isEstimate ? "≈ " : "") + $0.formatted(date: .omitted, time: .shortened) }
-                 ?? (airport?.city ?? "—"))
+            Text(time?.formatted(date: .omitted, time: .shortened) ?? airport?.city ?? "—")
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(.secondary)
         }
@@ -112,10 +112,12 @@ struct FlightCardView: View {
     }
 
     private var statsRow: some View {
-        HStack(spacing: 14) {
-            stat("Alt", flight.state.altitudeFeet.map { "\(Int($0).formatted()) ft" } ?? "—")
-            stat("Speed", flight.state.groundSpeedKnots.map { "\(Int(($0 * 1.15078).rounded())) mph" } ?? "—")
-            stat("Hdg", flight.state.heading.map { "\(Int($0))°" } ?? "—")
+        // After landing the last position is on the taxiway, so the in-flight stats are blank.
+        let position = flight.hasLanded ? nil : flight.position
+        return HStack(spacing: 14) {
+            stat("Alt", position?.altitudeFeet.map { "\(Int($0).formatted()) ft" } ?? "—")
+            stat("Speed", position?.groundSpeedKnots.map { "\(Int(($0 * 1.15078).rounded())) mph" } ?? "—")
+            stat("Hdg", position?.heading.map { "\(Int($0))°" } ?? "—")
             Spacer()
         }
     }
@@ -129,45 +131,5 @@ struct FlightCardView: View {
         }
         .font(.caption)
         .lineLimit(1)
-    }
-
-    private var footer: some View {
-        HStack(spacing: 10) {
-            Picker("Camera", selection: Binding(
-                get: { tracker.cameraMode },
-                set: { tracker.cameraMode = $0 }
-            )) {
-                ForEach(FlightTracker.CameraMode.allCases, id: \.self) { mode in
-                    Text(mode.rawValue).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-            .frame(width: 150)
-            .controlSize(.small)
-            Button {
-                tracker.recenter()
-            } label: {
-                Image(systemName: "scope")
-            }
-            .accessibilityLabel("Recenter")
-            Spacer()
-            if let updated = tracker.lastUpdate {
-                // Last position update time; the clock glyph replaces the word "Updated"
-                // so the row fits the narrower landscape column.
-                Label(updated.formatted(date: .omitted, time: .shortened), systemImage: "clock")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .fixedSize()
-                    .accessibilityLabel("Updated \(updated.formatted(date: .omitted, time: .shortened))")
-            }
-            Button {
-                showAttributions.toggle()
-            } label: {
-                Image(systemName: "info.circle")
-            }
-            .accessibilityLabel("Data attributions")
-        }
-        .font(.caption)
     }
 }

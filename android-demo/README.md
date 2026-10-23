@@ -1,12 +1,11 @@
 # MyRadar Android SDK demo
 
 A one-screen flight tracker over the MyRadar weather map, built on the MyRadar Android SDK.
-Search for a flight number (`UA 1`, `DAL100`), an airport (`SFO`, `KJFK`) or a route (`SFO-LAX`),
-or tap the airplane button for an offline sample flight from San Francisco to New York. Layer chips
-turn radar and each overlay on and off; the layers button picks the base map and radar product;
-the opacity button shows a slider for radar, warnings, hurricanes and wind. The flight card's
-**Follow** / **Route** switch keeps the camera on the aircraft at a regional zoom or fits the whole
-route.
+Enter a flight number (`UA 1`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its
+planned route, the track it has flown, the route ahead, its airports and the aircraft, updated
+until it lands. The card below the map shows what the SDK reports about it. Layer chips turn radar
+and each overlay on and off; the layers button picks the base map and radar product; the opacity
+button shows a slider for radar, warnings, hurricanes and wind.
 
 ## Requirements
 
@@ -109,15 +108,22 @@ How the SDK is wired in, as in any third-party app:
 | Layer chips | `radarEnabled`, `overlays`, `Overlay` |
 | Layers menu | `mapStyle`, `radarProduct` |
 | Opacity row | `radarOpacity`, `overlayOpacities`, `Overlay.supportsOpacity` |
-| Flown path (solid) and remaining route (dashed) | `polylines`, `MapPolyline` with `dashPattern` and `outlineColor` |
-| Rotated aircraft icon, airport code labels | `markers`, `MapMarker.Icon.Image` with `heading`, `MapMarker.Icon.Text` |
-| Follow mode at an exact zoom | `camera` with `MapCamera` |
-| Route mode | `visibleRegion`, `CoordinateRegion.fitting` |
-| Tapping the aircraft or an airport | `onMarkerTap` with `userInfo` |
-| Attributions panel (ⓘ on the card) | `MyRadarMapView.licensesAndAttributions` |
+| The flight on the map | `flight` |
+| Flight card | `onFlightUpdate` with `FlightInfo` |
+| "Couldn't find that flight" banner | `onFlightError` with `FlightException` |
+| Flood mock (`--es mock flood`) | `polygons`, `markers`, `onMarkerTap` |
+| Attributions panel (ⓘ by the search box) | `MyRadarMapView.licensesAndAttributions` |
 
-Flight data comes from free, keyless public services (adsb.lol, adsbdb.com, hexdb.io, with
-OpenSky as a track fallback); the SDK itself makes no flight-related requests.
+The app has no flight-data code: it passes the flight number to the map and shows the
+`FlightInfo` the SDK reports.
+
+```kotlin
+MyRadarMap(
+    flight = ident,                          // null shows no flight
+    onFlightUpdate = { flight = it },        // on load and every update
+    onFlightError = { errorMessage = it.message },
+)
+```
 
 ## Launch extras
 
@@ -128,7 +134,7 @@ adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity \
     --es query "UA 1" --es overlays warnings,lightning,wind --es style dark --ef zoom 6
 ```
 
-Supported extras: `--ez sample true`, `--es query <text>`, `--ef zoom <level>`,
-`--es center <lat>,<lon>`, `--es overlays <list|none>`, `--es style <name>`, `--ez route true`,
+Supported extras: `--es query <flight number>`, `--ef zoom <level>`,
+`--es center <lat>,<lon>`, `--es overlays <list|none>`, `--es style <name>`,
 `--ez kiosk true` (map only, full screen), `--es mock flood` (mock flood-forecast polygons),
 `--es opacity warnings=0.9,hurricanes=0.3`. See `LaunchOptions.kt`.

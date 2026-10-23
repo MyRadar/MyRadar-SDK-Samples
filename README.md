@@ -43,5 +43,6 @@ then follow the README in the sample's folder; each starts with a command-line q
 With a valid key, radar and warnings appear within a few seconds. A map with no weather means the
 key is missing or was rejected; each sample's README explains how to tell which.
 
-Flight data comes from free public sources (adsb.lol, adsbdb, hexdb.io, OpenSky and Flightradar24's web
-feed, depending on the sample); the SDKs themselves make no flight-related requests.
+None of the samples contains flight-data code. Each passes the flight number to its SDK's
+`showFlight`, which looks the flight up through the MyRadar API gateway, draws it, and keeps it
+updated; the sample shows the flight details the SDK reports.

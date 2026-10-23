@@ -1,11 +1,11 @@
 # MyRadar iOS SDK demo
 
-A one-screen flight tracker over the MyRadar weather map, built on the MyRadar iOS SDK. Search for a
-flight number (`UA 1`, `DAL100`), an airport (`SFO`, `KJFK`) or a route (`SFO-LAX`), or tap the
-airplane button for an offline sample flight from San Francisco to New York. Layer chips turn radar
-and each overlay on and off; the layers menu picks the base map and radar product; the opacity row
-sets radar, warnings, hurricanes and wind opacity. The flight card's **Follow** / **Route** switch
-keeps the camera on the aircraft at a regional zoom or fits the whole route.
+A one-screen flight tracker over the MyRadar weather map, built on the MyRadar iOS SDK. Enter a
+flight number (`UA 1`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its planned
+route, the track it has flown, the route ahead, its airports and the aircraft, updated until it
+lands. The card below the map shows what the SDK reports about it. Layer chips turn radar and
+each overlay on and off; the layers menu picks the base map and radar product; the opacity row
+sets radar, warnings, hurricanes and wind opacity.
 
 ## Requirements
 
@@ -87,22 +87,29 @@ How the SDK is wired in, as in any third-party app:
 | Layer chips | `.radarEnabled(_:)`, `.overlays(_:)`, `Overlay` |
 | Layers menu | `.mapStyle(_:)`, `.radarProduct(_:)` |
 | Opacity row | `.radarOpacity(_:)`, `.overlayOpacity(_:for:)`, `Overlay.supportsOpacity` |
-| Flown path (solid) and remaining route (dashed) | `.polylines(_:)`, `MapPolyline` with `dashPattern` and `outlineColor` |
-| Rotated aircraft icon, airport code labels | `.markers(_:)`, `MapMarker.Icon.image(_:)` with `heading`, `MapMarker.Icon.text(_:color:)` |
-| Follow mode at an exact zoom | `.camera(_:animated:)` with `MapCamera` |
-| Route mode | `.visibleRegion(_:animated:)`, `MyRadarMapView.region(fitting:paddingFraction:)` |
-| Tapping the aircraft or an airport | `.onMarkerTap(_:)` with `userInfo` |
+| The flight on the map | `.flight(_:)` |
+| Flight card | `.onFlightUpdate(_:)` with `FlightInfo` |
+| "Couldn't find that flight" banner | `.onFlightError(_:)` with `FlightError` |
+| Flood mock (`--mock flood`) | `.polygons(_:)`, `.markers(_:)`, `.onMarkerTap(_:)` |
 | Attributions panel | `MyRadarMapView.licensesAndAttributions` |
 
-Flight data comes from free, keyless public services (adsb.lol, adsbdb.com, hexdb.io, with
-OpenSky as a track fallback); the SDK itself makes no flight-related requests.
+The app has no flight-data code: it passes the flight number to the map and shows the
+`FlightInfo` the SDK reports.
+
+```swift
+MyRadarMap()
+    .flight(ident)                          // nil shows no flight
+    .onFlightUpdate { flight = $0 }         // on load and every update
+    .onFlightError { errorMessage = $0.localizedDescription }
+```
 
 ## Launch arguments
 
 For testing and screenshots, the app accepts launch arguments, for example from the command line:
 
 ```sh
-xcrun simctl launch booted com.myradar.MyRadarSDKDemo --center 46.9,-91.8 --zoom 6 --overlays warnings
+xcrun simctl launch booted com.myradar.MyRadarSDKDemo --query UA1 --overlays warnings,lightning
 ```
 
-Others include `--sample`, `--kiosk`, `--style` and `--route`; see `ContentView.swift`.
+Others include `--center`, `--zoom`, `--kiosk`, `--style`, `--opacity` and `--mock flood`; see
+`ContentView.swift`.

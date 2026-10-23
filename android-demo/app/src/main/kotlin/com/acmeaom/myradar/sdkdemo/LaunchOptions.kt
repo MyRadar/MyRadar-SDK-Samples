@@ -16,24 +16,20 @@ import com.acmeaom.myradar.sdk.Overlay
  *
  * | Extra | Effect |
  * |---|---|
- * | `--ez sample true` | Loads the offline sample flight |
- * | `--es query <text>` | Runs a search at launch and tracks the first result |
+ * | `--es query <flight number>` | Shows a flight at launch |
  * | `--ef zoom <level>`, `--es center <lat>,<lon>` | Initial camera |
  * | `--es overlays a,b,c` | Initial overlays: warnings, lightning, flashes, hurricanes, wind, none |
  * | `--es style <name>` | Base map: gray, roads, aerial, topographic, dark, light |
- * | `--ez route true` | Starts in whole-route camera mode instead of following the aircraft |
  * | `--ez kiosk true` | Shows only the map, full screen |
  * | `--es mock flood` | Paints the mock flood-forecast overlay (see [FloodMock]) |
  * | `--es opacity warnings=0.9,hurricanes=0.3` | Initial overlay opacities |
  */
 data class LaunchOptions(
-    val sample: Boolean = false,
     val query: String? = null,
     val zoom: Float? = null,
     val center: LatLng? = null,
     val overlays: Set<Overlay>? = null,
     val style: MapStyle? = null,
-    val routeMode: Boolean = false,
     val kiosk: Boolean = false,
     val floodMock: Boolean = false,
     val overlayOpacities: Map<Overlay, Float> = emptyMap(),
@@ -42,7 +38,6 @@ data class LaunchOptions(
         fun from(intent: Intent?): LaunchOptions {
             val extras = intent?.extras ?: return LaunchOptions()
             return LaunchOptions(
-                sample = extras.getBoolean("sample"),
                 query = extras.getString("query"),
                 zoom = extras.getFloat("zoom", Float.NaN).takeUnless { it.isNaN() }
                     ?: extras.getString("zoom")?.toFloatOrNull(),
@@ -51,7 +46,6 @@ data class LaunchOptions(
                 overlays = extras.getString("overlays")?.let(::parseOverlays),
                 style = extras.getString("style")?.lowercase()
                     ?.let { name -> MapStyle.entries.firstOrNull { it.displayName.lowercase() == name } },
-                routeMode = extras.getBoolean("route"),
                 kiosk = extras.getBoolean("kiosk"),
                 floodMock = extras.getString("mock") == "flood",
                 overlayOpacities = extras.getString("opacity")?.let(::parseOpacities).orEmpty(),

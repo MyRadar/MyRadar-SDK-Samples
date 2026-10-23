@@ -273,14 +273,6 @@ body {
   border-top: 1px solid var(--line);
 }
 
-.data-credit {
-  margin: 16px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 13px;
-}
-
 .map-legend {
   left: 16px;
   bottom: 40px;
@@ -349,76 +341,6 @@ body {
   background: rgba(10, 16, 26, 0.82);
   color: #e8edf5;
   border-color: #e8edf5;
-}
-
-/* Markers drawn by FlightTracker */
-
-.map-plane {
-  position: relative;
-  width: 46px;
-  height: 46px;
-}
-
-.map-plane-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 2px solid rgba(77, 163, 255, 0.9);
-  background: rgba(17, 26, 38, 0.55);
-  color: #fff;
-  display: grid;
-  place-items: center;
-}
-
-.map-plane-icon svg {
-  width: 30px;
-  height: 30px;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
-}
-
-.map-plane.stale .map-plane-icon {
-  border-color: #9aa3b5;
-  color: #c9d0db;
-}
-
-.map-label {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  white-space: nowrap;
-  padding: 5px 10px;
-  border-radius: 7px;
-  background: rgba(10, 16, 26, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #dfe5ee;
-  font-size: 13px;
-  pointer-events: none;
-}
-
-.map-label b {
-  color: #fff;
-  margin-right: 4px;
-}
-
-.map-plane-label {
-  left: 56px;
-}
-
-.map-airport {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 3px rgba(11, 111, 214, 0.45);
-}
-
-.map-airport-label.left {
-  right: 24px;
-}
-
-.map-airport-label.right {
-  left: 24px;
 }
 
 /* ------------------------------------------------------------------------------------------- */
@@ -614,57 +536,6 @@ button.chip[aria-pressed='true'] {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
-}
-
-/* Suggestions and search choices */
-
-.suggest-title {
-  margin-top: 22px;
-}
-
-.suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.suggestion {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  grid-template-areas:
-    'flight route'
-    'flight type';
-  column-gap: 12px;
-  align-items: center;
-  text-align: left;
-  padding: 10px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--card);
-  font: inherit;
-  color: var(--fg);
-  cursor: pointer;
-}
-
-.suggestion:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-.suggestion-flight {
-  grid-area: flight;
-  font-weight: 700;
-}
-
-.suggestion-route {
-  grid-area: route;
-}
-
-.suggestion-type {
-  grid-area: type;
-  color: var(--muted);
-  font-size: 13px;
 }
 
 /* Details card */
