@@ -137,4 +137,5 @@ adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity \
 Supported extras: `--es query <flight number>`, `--ef zoom <level>`,
 `--es center <lat>,<lon>`, `--es overlays <list|none>`, `--es style <name>`,
 `--ez kiosk true` (map only, full screen), `--es mock flood` (mock flood-forecast polygons),
-`--es opacity warnings=0.9,hurricanes=0.3`. See `LaunchOptions.kt`.
+`--es opacity warnings=0.9,hurricanes=0.3`, `--es opacity-panel warnings` (opens the opacity
+row on a layer). See `LaunchOptions.kt`.

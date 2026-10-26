@@ -111,5 +111,5 @@ For testing and screenshots, the app accepts launch arguments, for example from 
 xcrun simctl launch booted com.myradar.MyRadarSDKDemo --query UA1 --overlays warnings,lightning
 ```
 
-Others include `--center`, `--zoom`, `--kiosk`, `--style`, `--opacity` and `--mock flood`; see
-`ContentView.swift`.
+Others include `--center`, `--zoom`, `--kiosk`, `--style`, `--opacity`, `--opacity-panel` (opens
+the opacity row on a layer) and `--mock flood`; see `ContentView.swift`.

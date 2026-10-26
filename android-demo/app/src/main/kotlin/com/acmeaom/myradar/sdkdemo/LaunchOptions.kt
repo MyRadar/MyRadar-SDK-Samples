@@ -23,6 +23,7 @@ import com.acmeaom.myradar.sdk.Overlay
  * | `--ez kiosk true` | Shows only the map, full screen |
  * | `--es mock flood` | Paints the mock flood-forecast overlay (see [FloodMock]) |
  * | `--es opacity warnings=0.9,hurricanes=0.3` | Initial overlay opacities |
+ * | `--es opacity-panel <layer>` | Opens the opacity row on a layer: radar, warnings, hurricanes, wind |
  */
 data class LaunchOptions(
     val query: String? = null,
@@ -33,6 +34,7 @@ data class LaunchOptions(
     val kiosk: Boolean = false,
     val floodMock: Boolean = false,
     val overlayOpacities: Map<Overlay, Float> = emptyMap(),
+    val opacityPanel: String? = null,
 ) {
     companion object {
         fun from(intent: Intent?): LaunchOptions {
@@ -49,6 +51,7 @@ data class LaunchOptions(
                 kiosk = extras.getBoolean("kiosk"),
                 floodMock = extras.getString("mock") == "flood",
                 overlayOpacities = extras.getString("opacity")?.let(::parseOpacities).orEmpty(),
+                opacityPanel = extras.getString("opacity-panel")?.lowercase(),
             )
         }
 

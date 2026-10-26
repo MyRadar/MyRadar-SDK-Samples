@@ -452,6 +452,12 @@ struct ContentView: View {
             if names.contains("wind") { selected.insert(.wind) }
             overlays = selected
         }
+        // `--opacity-panel <radar|warnings|hurricanes|wind>` opens the opacity row on that layer.
+        if let name = Self.launchArgument("--opacity-panel")?.lowercased(),
+           let target = OpacityTarget.all.first(where: { $0.title.lowercased() == name }) {
+            opacityTarget = target
+            showsOpacityControl = true
+        }
         if let query = Self.launchArgument("--query") {
             searchText = query
             track(query)

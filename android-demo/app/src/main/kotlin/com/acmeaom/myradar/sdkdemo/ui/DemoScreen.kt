@@ -120,8 +120,10 @@ fun DemoScreen(options: LaunchOptions) {
     var overlays by remember { mutableStateOf(options.overlays ?: setOf(Overlay.Warnings, Overlay.Lightning)) }
     var radarOpacity by remember { mutableStateOf(if (options.floodMock) 0.4f else 0.65f) }
     val overlayOpacities = remember { mutableStateMapOf<Overlay, Float>().apply { putAll(options.overlayOpacities) } }
-    var showsOpacityControl by remember { mutableStateOf(false) }
-    var opacityTarget by remember { mutableStateOf<OpacityTarget>(OpacityTarget.Radar) }
+    var showsOpacityControl by remember { mutableStateOf(options.opacityPanel != null) }
+    var opacityTarget by remember {
+        mutableStateOf(OpacityTarget.all.firstOrNull { it.title.lowercase() == options.opacityPanel } ?: OpacityTarget.Radar)
+    }
     var showAttributions by remember { mutableStateOf(false) }
     var tappedMarkerMessage by remember { mutableStateOf<String?>(null) }
 
