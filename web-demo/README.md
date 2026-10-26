@@ -76,7 +76,7 @@ rejected. Restart `npm run dev` after editing `.env.local`.
   often is over oceans). The SDK keeps it updated every minute until it lands.
 - **Flight card**: status, origin → destination, aircraft type and registration, landing time,
   a progress bar, and time to go, altitude, speed and heading. **Follow** keeps the aircraft
-  centred; **Show whole route** frames the trip again.
+  centred; **Show whole route** fits the map to the trip again.
 - **About this flight** and a **timeline** of departure, now and landing.
 - **Map layers** card: a `LayerControl` to turn radar, wind, hurricanes, watches & warnings,
   and lightning strikes and flashes on and off, and the `TimeSlider` (the radar starts paused on
