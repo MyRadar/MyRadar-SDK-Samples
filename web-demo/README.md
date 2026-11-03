@@ -73,7 +73,9 @@ rejected. Restart `npm run dev` after editing `.env.local`.
 - **The flight on the map**, drawn by the SDK's `showFlight`: the track it has flown (white),
   the planned route ahead (blue dashes) and already flown (faint dashes), the airports, and the
   aircraft with its flight number and altitude (hollow when its position is estimated, as it
-  often is over oceans). The SDK keeps it updated every minute until it lands.
+  often is over oceans). The SDK keeps it updated every minute until it lands. American
+  Airlines flights (`AA 1`) show the sample's own aircraft icon, `src/assets/american-787.png`,
+  through the `aircraftIcon` option; other flights keep the SDK's built-in aircraft.
 - **Flight card**: status, origin → destination, aircraft type and registration, landing time,
   a progress bar, and time to go, altitude, speed and heading. **Follow** keeps the aircraft
   centred; **Show whole route** fits the map to the trip again.

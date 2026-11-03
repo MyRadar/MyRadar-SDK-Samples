@@ -374,7 +374,7 @@ struct ContentView: View {
                 tappedMarkerMessage = marker.userInfo["depth"].map { "Water depth \($0)" }
             }
             // The SDK looks the flight up, draws it and updates it until it lands.
-            .flight(ident)
+            .flight(ident, options: flightOptions(for: ident))
             .onFlightUpdate { info in
                 flight = info
                 errorMessage = nil
@@ -386,6 +386,15 @@ struct ContentView: View {
     }
 
     // MARK: - Tracking
+
+    /// Your own aircraft icon: American Airlines flights get a 787 in its livery, drawn nose up;
+    /// every other flight keeps the SDK's built-in aircraft.
+    private func flightOptions(for ident: String?) -> FlightOptions {
+        guard let ident, ident.range(of: #"^AAL?\s*\d"#, options: [.regularExpression, .caseInsensitive]) != nil else {
+            return FlightOptions()
+        }
+        return FlightOptions(aircraftIcon: UIImage(named: "AmericanAircraft"), aircraftIconSize: 64)
+    }
 
     private func track(_ text: String) {
         let query = text.trimmingCharacters(in: .whitespacesAndNewlines)

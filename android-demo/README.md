@@ -109,6 +109,7 @@ How the SDK is wired in, as in any third-party app:
 | Layers menu | `mapStyle`, `radarProduct` |
 | Opacity row | `radarOpacity`, `overlayOpacities`, `Overlay.supportsOpacity` |
 | The flight on the map | `flight` |
+| American Airlines aircraft icon (`AA 1`) | `flightOptions = FlightOptions(aircraftIcon = …)`, image `res/drawable-nodpi/american_787.png` |
 | Flight card | `onFlightUpdate` with `FlightInfo` |
 | "Couldn't find that flight" banner | `onFlightError` with `FlightException` |
 | Flood mock (`--es mock flood`) | `polygons`, `markers`, `onMarkerTap` |

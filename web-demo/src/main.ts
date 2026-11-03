@@ -13,6 +13,7 @@ import {
 } from '@myradar/mapbox';
 import { LayerControl, TimeSlider, weatherLayerItems } from '@myradar/controls';
 import { INITIAL_VIEW, MAPBOX_TOKEN, MAP_STYLE, MYRADAR_API_KEY } from './config';
+import americanAircraft from './assets/american-787.png';
 import './style.css';
 
 const params = new URLSearchParams(location.search);
@@ -109,13 +110,19 @@ const searchInput = $<HTMLInputElement>('search-input');
 let flight: FlightLayer | null = null;
 let follow = false;
 
+// Your own aircraft icon: American Airlines flights get a 787 in its livery, drawn nose up; every
+// other flight keeps the SDK's built-in aircraft.
+function aircraftFor(query: string): { aircraftIcon?: string; aircraftIconSize?: number } {
+  return /^AAL?\s*\d/i.test(query) ? { aircraftIcon: americanAircraft, aircraftIconSize: 64 } : {};
+}
+
 function track(ident: string): void {
   const query = ident.trim();
   if (!query) return;
   flight?.remove();
   setUrlFlight(query);
   renderMessage('Searching', `Looking for ${query.toUpperCase()}…`, 'Finding the flight and its route.');
-  const shown = showFlight(map, query, { apiKey });
+  const shown = showFlight(map, query, { apiKey, ...aircraftFor(query) });
   flight = shown;
   shown.on('data', ({ flight: info }) => {
     renderFlight(info);
