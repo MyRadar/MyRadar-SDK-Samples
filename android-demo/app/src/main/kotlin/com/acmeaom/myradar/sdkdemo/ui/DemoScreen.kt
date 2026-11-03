@@ -1,5 +1,6 @@
 package com.acmeaom.myradar.sdkdemo.ui
 
+import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -75,6 +76,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.acmeaom.myradar.sdk.FlightInfo
+import com.acmeaom.myradar.sdk.FlightOptions
 import com.acmeaom.myradar.sdk.LatLng
 import com.acmeaom.myradar.sdk.MapCamera
 import com.acmeaom.myradar.sdk.MapStyle
@@ -84,6 +86,7 @@ import com.acmeaom.myradar.sdk.RadarProduct
 import com.acmeaom.myradar.sdk.compose.MyRadarMap
 import com.acmeaom.myradar.sdkdemo.FloodMock
 import com.acmeaom.myradar.sdkdemo.LaunchOptions
+import com.acmeaom.myradar.sdkdemo.R
 
 /*
  * A one-screen flight tracker built on the MyRadar Android SDK. Controls sit above the map, the
@@ -132,6 +135,13 @@ fun DemoScreen(options: LaunchOptions) {
     var ident by remember { mutableStateOf(options.query) }
     var flight by remember { mutableStateOf<FlightInfo?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    // The sample's own aircraft icon, drawn nose up, in place of the SDK's built-in aircraft.
+    val flightOptions = remember {
+        FlightOptions(
+            aircraftIcon = BitmapFactory.decodeResource(context.resources, R.drawable.custom_aircraft),
+            aircraftIconSizeDp = 64f,
+        )
+    }
     val track = { text: String ->
         val query = text.trim()
         if (query.isNotEmpty()) {
@@ -176,6 +186,7 @@ fun DemoScreen(options: LaunchOptions) {
                 onMarkerTap = { marker -> tappedMarkerMessage = marker.userInfo["depth"]?.let { "Water depth $it" } },
                 // The SDK looks the flight up, draws it and updates it until it lands.
                 flight = ident,
+                flightOptions = flightOptions,
                 onFlightUpdate = {
                     flight = it
                     errorMessage = null

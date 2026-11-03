@@ -374,7 +374,8 @@ struct ContentView: View {
                 tappedMarkerMessage = marker.userInfo["depth"].map { "Water depth \($0)" }
             }
             // The SDK looks the flight up, draws it and updates it until it lands.
-            .flight(ident)
+            // The sample's own aircraft icon, drawn nose up, in place of the SDK's built-in aircraft.
+            .flight(ident, options: FlightOptions(aircraftIcon: UIImage(named: "CustomAircraft"), aircraftIconSize: 64))
             .onFlightUpdate { info in
                 flight = info
                 errorMessage = nil
