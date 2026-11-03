@@ -87,7 +87,8 @@ How the SDK is wired in, as in any third-party app:
 | Layer chips | `.radarEnabled(_:)`, `.overlays(_:)`, `Overlay` |
 | Layers menu | `.mapStyle(_:)`, `.radarProduct(_:)` |
 | Opacity row | `.radarOpacity(_:)`, `.overlayOpacity(_:for:)`, `Overlay.supportsOpacity` |
-| The flight on the map | `.flight(_:)` |
+| The flight on the map | `.flight(_:options:)` |
+| Custom aircraft icon | `FlightOptions(aircraftIcon:aircraftIconSize:)`, image `CustomAircraft` in `Assets.xcassets` |
 | Flight card | `.onFlightUpdate(_:)` with `FlightInfo` |
 | "Couldn't find that flight" banner | `.onFlightError(_:)` with `FlightError` |
 | Flood mock (`--mock flood`) | `.polygons(_:)`, `.markers(_:)`, `.onMarkerTap(_:)` |

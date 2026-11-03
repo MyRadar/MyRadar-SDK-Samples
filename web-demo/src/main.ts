@@ -13,6 +13,7 @@ import {
 } from '@myradar/mapbox';
 import { LayerControl, TimeSlider, weatherLayerItems } from '@myradar/controls';
 import { INITIAL_VIEW, MAPBOX_TOKEN, MAP_STYLE, MYRADAR_API_KEY } from './config';
+import customAircraft from './assets/custom-aircraft.png';
 import './style.css';
 
 const params = new URLSearchParams(location.search);
@@ -115,7 +116,8 @@ function track(ident: string): void {
   flight?.remove();
   setUrlFlight(query);
   renderMessage('Searching', `Looking for ${query.toUpperCase()}…`, 'Finding the flight and its route.');
-  const shown = showFlight(map, query, { apiKey });
+  // The sample's own aircraft icon, drawn nose up, in place of the SDK's built-in aircraft.
+  const shown = showFlight(map, query, { apiKey, aircraftIcon: customAircraft, aircraftIconSize: 64 });
   flight = shown;
   shown.on('data', ({ flight: info }) => {
     renderFlight(info);
