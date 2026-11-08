@@ -63,7 +63,7 @@ You need [Node.js](https://nodejs.org) 20.19 or later, a MyRadar API key from th
 
 Radar should start drawing within a few seconds. If the map shows but no radar or warnings, the
 MyRadar key is missing or was rejected: the page shows "No MyRadar API key" when it is missing,
-and the browser console shows `401` responses from `sdkwrapperapi.azure-api.net` when it was
+and the browser console shows `401` responses from `sdkapi.acmeaom.com` when it was
 rejected. Restart `npm run dev` after editing `.env.local`.
 
 ## What it shows

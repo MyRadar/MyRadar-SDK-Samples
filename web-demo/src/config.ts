@@ -7,7 +7,7 @@ export const MAPBOX_TOKEN = (import.meta.env.VITE_MAPBOX_TOKEN as string | undef
 export const MAP_STYLE = 'mapbox://styles/mapbox/dark-v11';
 
 /**
- * MyRadar SDK API key for the gateway at https://sdkwrapperapi.azure-api.net. Set
+ * MyRadar SDK API key for the gateway at https://sdkapi.acmeaom.com. Set
  * `VITE_MYRADAR_API_KEY` in `.env.local` (see `.env.example`) or pass `?apiKey=...`.
  */
 export const MYRADAR_API_KEY = (import.meta.env.VITE_MYRADAR_API_KEY as string | undefined) || '';
