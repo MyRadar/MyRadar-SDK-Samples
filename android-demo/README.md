@@ -1,7 +1,7 @@
 # MyRadar Android SDK demo
 
 A one-screen flight tracker over the MyRadar weather map, built on the MyRadar Android SDK.
-Enter a flight number (`UA 1`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its
+Enter a flight number (`AA 100`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its
 planned route, the track it has flown, the route ahead, its airports and the aircraft, updated
 until it lands. The card below the map shows what the SDK reports about it. Layer chips turn radar
 and each overlay on and off; the layers button picks the base map and radar product; the opacity
@@ -132,7 +132,7 @@ For testing and screenshots, the app accepts intent extras:
 
 ```sh
 adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity \
-    --es query "UA 1" --es overlays warnings,lightning,wind --es style dark --ef zoom 6
+    --es query AA100 --es overlays warnings,lightning,wind --es style dark --ef zoom 6
 ```
 
 Supported extras: `--es query <flight number>`, `--ef zoom <level>`,

@@ -11,7 +11,7 @@ import com.acmeaom.myradar.sdk.Overlay
  *
  * ```
  * adb shell am start -n com.acmeaom.myradar.sdkdemo/.MainActivity \
- *     --es query "UA 1" --es overlays warnings,lightning --ef zoom 6
+ *     --es query AA100 --es overlays warnings,lightning --ef zoom 6
  * ```
  *
  * | Extra | Effect |
