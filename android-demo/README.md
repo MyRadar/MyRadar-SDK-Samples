@@ -10,8 +10,8 @@ button shows a slider for radar, warnings, hurricanes and wind.
 ## Requirements
 
 - Android Studio with the Android SDK for API 37 (the Gradle wrapper and JDK come with it).
-- A device or emulator running Android 10 (API 29) or later with OpenGL ES 3, on `arm64-v8a`,
-  `armeabi-v7a` or `x86_64`. Emulators need at least 2 CPU cores.
+- A device or emulator running Android 8 (API 26) or later with OpenGL ES 3, on any ABI. Give
+  emulators 4 CPU cores: on one core the map loads slowly.
 - A MyRadar API key from the [developer portal](https://myradar.com/developer_portal).
 
 The SDK comes from the MyRadar SDK Maven repository (`https://myradar.github.io/MyRadar-Android-SDK-Maven`); Gradle
