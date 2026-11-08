@@ -36,7 +36,7 @@ then follow the README in the sample's folder; each starts with a command-line q
   **MyRadarSDK** package to resolve, add the key to the scheme, and run on an iOS 17+ simulator.
 - **Android:** add the key to `android-demo/local.properties`, open `android-demo` in Android
   Studio and run the **app** configuration (or `./gradlew :app:installDebug` with `ANDROID_HOME`
-  set) on an Android 10+ emulator or device.
+  set) on an Android 8+ emulator or device.
 - **Web:** in `web-demo`, run `npm install`, put your keys in `.env.local`, then `npm run dev` and
   open <http://localhost:5173>. Needs Node.js 20.19 or later.
 

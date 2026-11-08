@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId = "com.acmeaom.myradar.sdkdemo"
         // The SDK requires Android 10 (API 29) and OpenGL ES 3.
-        minSdk = 29
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
