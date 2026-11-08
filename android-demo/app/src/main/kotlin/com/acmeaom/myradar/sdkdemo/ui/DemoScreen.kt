@@ -308,7 +308,7 @@ private fun SearchBar(text: String, onTextChange: (String) -> Unit, modifier: Mo
         value = text,
         onValueChange = onTextChange,
         modifier = modifier,
-        placeholder = { Text("Flight number, e.g. UA 1", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        placeholder = { Text("Flight number, e.g. AA 100", maxLines = 1, overflow = TextOverflow.Ellipsis) },
         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
         trailingIcon = {
             if (text.isNotEmpty()) {
@@ -484,7 +484,7 @@ private fun Hint() {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text("Track a flight over live radar", style = MaterialTheme.typography.titleMedium)
             Text(
-                "Enter an airline flight number (UA 1, AA 1643) or a callsign (UAL1). Tap a layer chip to turn " +
+                "Enter an airline flight number (AA 100, AA 1643) or a callsign (UAL1). Tap a layer chip to turn " +
                     "it on or off; the layers button picks the base map and radar product.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

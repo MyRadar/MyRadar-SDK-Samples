@@ -1,7 +1,7 @@
 # MyRadar iOS SDK demo
 
 A one-screen flight tracker over the MyRadar weather map, built on the MyRadar iOS SDK. Enter a
-flight number (`UA 1`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its planned
+flight number (`AA 100`, `AA 1643`) or a callsign (`UAL1`) and the SDK draws the flight: its planned
 route, the track it has flown, the route ahead, its airports and the aircraft, updated until it
 lands. The card below the map shows what the SDK reports about it. Layer chips turn radar and
 each overlay on and off; the layers menu picks the base map and radar product; the opacity row
@@ -109,7 +109,7 @@ MyRadarMap()
 For testing and screenshots, the app accepts launch arguments, for example from the command line:
 
 ```sh
-xcrun simctl launch booted com.myradar.MyRadarSDKDemo --query UA1 --overlays warnings,lightning
+xcrun simctl launch booted com.myradar.MyRadarSDKDemo --query AA100 --overlays warnings,lightning
 ```
 
 Others include `--center`, `--zoom`, `--kiosk`, `--style`, `--opacity`, `--opacity-panel` (opens
