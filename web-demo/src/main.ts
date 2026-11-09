@@ -199,7 +199,7 @@ function renderFlight(f: FlightInfo): void {
   const d = f.destination;
   const p = phase(f);
   const now = Date.now();
-  const title = o && d ? (f.landed ? `Landed in ${d.city}` : `${o.city} to ${d.city}`) : f.ident;
+  const title = o && d ? (f.landed ? `Landed at ${d.code}` : `${o.code} to ${d.code}`) : f.ident;
   const sub = [f.ident !== title ? f.ident : '', f.aircraftType, f.registration]
     .filter((s): s is string => !!s)
     .map(escapeHtml)
@@ -218,9 +218,9 @@ function renderFlight(f: FlightInfo): void {
   const progress =
     o && d && pct !== null
       ? `<div class="progress-labels">
-          <span><b>${escapeHtml(o.code)}</b> · ${f.actualDeparture ? `Departed ${fmtTime(f.actualDeparture)}` : escapeHtml(o.city)}</span>
+          <span><b>${escapeHtml(o.code)}</b>${f.actualDeparture ? ` · Departed ${fmtTime(f.actualDeparture)}` : f.scheduledDeparture ? ` · Departs ${fmtTime(f.scheduledDeparture)}` : ''}</span>
           <span class="progress-pct">${pct}% of the way</span>
-          <span><b>${escapeHtml(d.code)}</b> · ${escapeHtml(d.city)}</span>
+          <span><b>${escapeHtml(d.code)}</b></span>
         </div>
         <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Flight progress">
           <div class="progress-fill" style="width:${pct}%"></div>
@@ -261,8 +261,8 @@ function renderFlight(f: FlightInfo): void {
   detailsCard.innerHTML = `
     <div class="eyebrow">About this flight</div>
     <dl class="facts">
-      ${o ? fact('From', escapeHtml(o.name)) : ''}
-      ${d ? fact('To', escapeHtml(d.name)) : ''}
+      ${o ? fact('From', escapeHtml(o.name || [o.code, o.icao !== o.code ? o.icao : ''].filter(Boolean).join(' · '))) : ''}
+      ${d ? fact('To', escapeHtml(d.name || [d.code, d.icao !== d.code ? d.icao : ''].filter(Boolean).join(' · '))) : ''}
       ${fact('Aircraft', escapeHtml(f.aircraftType ?? '—'))}
       ${fact('Registration', escapeHtml(f.registration ?? '—'))}
       ${fact('Callsign', escapeHtml(f.identIcao ?? '—'))}
