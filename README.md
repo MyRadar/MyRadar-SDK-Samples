@@ -46,3 +46,10 @@ key is missing or was rejected; each sample's README explains how to tell which.
 None of the samples contains flight-data code. Each passes the flight number to its SDK's
 `showFlight`, which looks the flight up through the MyRadar API gateway, draws it, and keeps it
 updated; the sample shows the flight details the SDK reports.
+
+## SDK versions
+
+The demos follow the SDK releases automatically. When a new iOS or Android SDK is published, its
+release asks this repository's [`sdk-update` workflow](.github/workflows/sdk-update.yml) to move
+that demo to the new version; the workflow builds the demo against the published release and
+merges the change when it builds, or leaves the pull request open when it doesn't.
