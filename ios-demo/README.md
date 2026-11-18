@@ -77,7 +77,11 @@ How the SDK is wired in, as in any third-party app:
 
 - The project depends on the `MyRadarSDK` package product, which embeds the SDK and its rendering
   engine.
-- `MyRadarSDKDemoApp` calls `MyRadarSDK.configure(apiKey:)` at launch (see `DemoSecrets.swift`).
+- `MyRadarSDKDemoApp` calls `MyRadarSDK.configure(apiKey:environment:)` at launch (see
+  `DemoSecrets.swift`). The environment is production unless the `MYRADAR_ENVIRONMENT`
+  environment variable is `development`, which points the app at MyRadar's development gateway
+  (`sdkapi.myradar.dev`) for MyRadar's own testing; apps leave `environment` out. Pass it like
+  the key, e.g. `SIMCTL_CHILD_MYRADAR_ENVIRONMENT=development xcrun simctl launch …`.
 
 ## What it shows
 

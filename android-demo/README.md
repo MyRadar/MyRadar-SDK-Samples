@@ -98,7 +98,8 @@ How the SDK is wired in, as in any third-party app:
 - `settings.gradle.kts` adds the SDK's Maven repository.
 - `app/build.gradle.kts` depends on `com.acmeaom.myradar:myradar-sdk`; the engine artifact comes
   with it.
-- `DemoApplication` calls `MyRadarSdk.configure(apiKey = ...)` at launch.
+- `DemoApplication` calls `MyRadarSdk.configure(apiKey = ...)` at launch. Requests go to MyRadar's
+  production gateway (`sdkapi.myradar.com`), the SDK's default.
 
 ## What it shows
 
@@ -139,4 +140,16 @@ Supported extras: `--es query <flight number>`, `--ef zoom <level>`,
 `--es center <lat>,<lon>`, `--es overlays <list|none>`, `--es style <name>`,
 `--ez kiosk true` (map only, full screen), `--es mock flood` (mock flood-forecast polygons),
 `--es opacity warnings=0.9,hurricanes=0.3`, `--es opacity-panel warnings` (opens the opacity
-row on a layer). See `LaunchOptions.kt`.
+row on a layer), `--es environment development` (see below). See `LaunchOptions.kt`.
+
+### Testing against the development gateway
+
+MyRadar tests SDK builds against its development gateway (`sdkapi.myradar.dev`) before release.
+`--es environment development` makes the demo configure the SDK with
+`MyRadarEnvironment.DEVELOPMENT` before it creates the map; without it the demo uses production:
+
+```sh
+adb shell am start -S -n com.acmeaom.myradar.sdkdemo/.MainActivity --es environment development
+```
+
+Apps never need this: leave `environment` out of `configure`.

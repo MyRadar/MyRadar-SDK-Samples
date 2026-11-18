@@ -102,4 +102,4 @@ your key, like the weather layers. No proxies or other services are involved.
 ## URL parameters
 
 `?flight=UA1` shows a flight on load (the page keeps it up to date, so the URL can be
-shared), `?token=pk....` Mapbox token, `?apiKey=...` MyRadar key, `?debug` for console logs. The map position is kept in the URL hash.
+shared), `?token=pk....` Mapbox token, `?apiKey=...` MyRadar key, `?environment=development` MyRadar's development gateway (for MyRadar's own testing), `?debug` for console logs. The map position is kept in the URL hash.

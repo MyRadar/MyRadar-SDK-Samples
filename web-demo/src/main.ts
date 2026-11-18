@@ -20,6 +20,8 @@ const params = new URLSearchParams(location.search);
 mapboxgl.accessToken = params.get('token') || MAPBOX_TOKEN;
 const apiKey = params.get('apiKey') || MYRADAR_API_KEY;
 const debug = params.has('debug');
+// ?environment=development uses MyRadar's development gateway; apps leave it out (production).
+const environment = params.get('environment') === 'development' ? 'development' : 'production';
 
 const $ = <T extends HTMLElement>(id: string): T => {
   const el = document.getElementById(id);
@@ -68,7 +70,7 @@ const map = new mapboxgl.Map({
 map.touchZoomRotate.disableRotation();
 map.addControl(new mapboxgl.ScaleControl({ unit: 'imperial' }), 'bottom-right');
 
-const common = { apiKey, debug };
+const common = { apiKey, environment, debug } as const;
 // Paused on the newest frame so the map matches the live flight; the time slider plays the loop.
 const radar = new RadarLayer({ ...common, product: 'radar', palette: 'dark', opacity: 0.7, playing: false });
 const wind = new WindLayer({ ...common, visible: false });
@@ -117,7 +119,7 @@ function track(ident: string): void {
   setUrlFlight(query);
   renderMessage('Searching', `Looking for ${query.toUpperCase()}…`, 'Finding the flight and its route.');
   // The sample's own aircraft icon, drawn nose up, in place of the SDK's built-in aircraft.
-  const shown = showFlight(map, query, { apiKey, aircraftIcon: customAircraft, aircraftIconSize: 64 });
+  const shown = showFlight(map, query, { apiKey, environment, aircraftIcon: customAircraft, aircraftIconSize: 64 });
   flight = shown;
   shown.on('data', ({ flight: info }) => {
     renderFlight(info);

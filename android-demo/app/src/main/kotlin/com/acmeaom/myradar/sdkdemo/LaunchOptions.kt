@@ -3,6 +3,7 @@ package com.acmeaom.myradar.sdkdemo
 import android.content.Intent
 import com.acmeaom.myradar.sdk.LatLng
 import com.acmeaom.myradar.sdk.MapStyle
+import com.acmeaom.myradar.sdk.MyRadarEnvironment
 import com.acmeaom.myradar.sdk.Overlay
 
 /**
@@ -24,6 +25,7 @@ import com.acmeaom.myradar.sdk.Overlay
  * | `--es mock flood` | Paints the mock flood-forecast overlay (see [FloodMock]) |
  * | `--es opacity warnings=0.9,hurricanes=0.3` | Initial overlay opacities |
  * | `--es opacity-panel <layer>` | Opens the opacity row on a layer: radar, warnings, hurricanes, wind |
+ * | `--es environment <name>` | MyRadar gateway: production (default) or development, for testing SDK builds |
  */
 data class LaunchOptions(
     val query: String? = null,
@@ -35,6 +37,8 @@ data class LaunchOptions(
     val floodMock: Boolean = false,
     val overlayOpacities: Map<Overlay, Float> = emptyMap(),
     val opacityPanel: String? = null,
+    /** The gateway to use, when the launch asks for one; otherwise the SDK's default, production. */
+    val environment: MyRadarEnvironment? = null,
 ) {
     companion object {
         fun from(intent: Intent?): LaunchOptions {
@@ -52,6 +56,8 @@ data class LaunchOptions(
                 floodMock = extras.getString("mock") == "flood",
                 overlayOpacities = extras.getString("opacity")?.let(::parseOpacities).orEmpty(),
                 opacityPanel = extras.getString("opacity-panel")?.lowercase(),
+                environment = extras.getString("environment")?.lowercase()
+                    ?.let { name -> MyRadarEnvironment.entries.firstOrNull { it.name.lowercase() == name } },
             )
         }
 
