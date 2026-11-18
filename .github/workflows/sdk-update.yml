@@ -1,0 +1,154 @@
+# Moves a demo to a new MyRadar SDK release.
+#
+# The iOS and Android SDK release workflows send a repository_dispatch `sdk-released` with
+# {"platform": "ios" | "android", "version": "X.Y.Z"} once the release is public. This workflow
+# then updates that demo (iOS: the package requirement and Package.resolved; Android:
+# myradar.sdkVersion), builds it against the published release, and opens a pull request,
+# which it merges when the build passes. When the build fails, the pull request stays open with
+# the failure noted, for a person to look at.
+#
+# A manual run does the same for a chosen platform and version; with dry run it builds without
+# opening a pull request.
+#
+# Needs the MyRadar release GitHub App (variable MYRADAR_RELEASE_APP_ID, secret
+# MYRADAR_RELEASE_APP_KEY) installed on this repository with contents and pull request access.
+name: Update an SDK version
+
+on:
+  repository_dispatch:
+    types: [sdk-released]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Demo to update
+        type: choice
+        options: [ios, android]
+      version:
+        description: SDK version (X.Y.Z), already published
+        type: string
+        required: true
+      dry_run:
+        description: Build only; open no pull request
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sdk-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ${{ (github.event.client_payload.platform || inputs.platform) == 'ios' && 'macos-latest' || 'ubuntu-latest' }}
+    env:
+      PLATFORM: ${{ github.event.client_payload.platform || inputs.platform }}
+      VERSION: ${{ github.event.client_payload.version || inputs.version }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - name: Check the request
+        run: |
+          case "$PLATFORM" in ios|android) ;; *) echo "::error::platform must be ios or android, not '$PLATFORM'"; exit 1 ;; esac
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must be X.Y.Z, not '$VERSION'"; exit 1; }
+          echo "BRANCH=sdk-$PLATFORM-$VERSION" >> "$GITHUB_ENV"
+
+      - name: Token
+        id: app
+        if: env.DRY_RUN != 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.MYRADAR_RELEASE_APP_ID }}
+          private-key: ${{ secrets.MYRADAR_RELEASE_APP_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app.outputs.token || github.token }}
+
+      # ---------- Android ----------
+      - name: Android demo version
+        if: env.PLATFORM == 'android'
+        run: |
+          sed -i -E "s/^myradar.sdkVersion=.*/myradar.sdkVersion=$VERSION/" android-demo/gradle.properties
+          grep "^myradar.sdkVersion=$VERSION$" android-demo/gradle.properties
+
+      - uses: actions/setup-java@v4
+        if: env.PLATFORM == 'android'
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build the Android demo
+        id: android
+        if: env.PLATFORM == 'android'
+        continue-on-error: true
+        working-directory: android-demo
+        run: ./gradlew --console=plain -q :app:assembleDebug
+
+      # ---------- iOS ----------
+      - name: Select Xcode
+        if: env.PLATFORM == 'ios'
+        env:
+          WANT: ${{ vars.XCODE_VERSION }}
+        run: |
+          if [ -n "$WANT" ]; then app="/Applications/Xcode_$WANT.app"
+          else app=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1); fi
+          sudo xcode-select -s "$app"
+          xcodebuild -version
+
+      - name: iOS demo version
+        if: env.PLATFORM == 'ios'
+        working-directory: ios-demo
+        run: |
+          sed -i '' -E "s/minimumVersion = [0-9]+\.[0-9]+\.[0-9]+;/minimumVersion = $VERSION;/" MyRadarSDKDemo.xcodeproj/project.pbxproj
+          grep -q "minimumVersion = $VERSION;" MyRadarSDKDemo.xcodeproj/project.pbxproj
+          xcodebuild -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo -resolvePackageDependencies -quiet
+          grep -q "\"version\" : \"$VERSION\"" MyRadarSDKDemo.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+            || { echo "::error::Package.resolved did not resolve $VERSION"; exit 1; }
+
+      - name: Build the iOS demo
+        id: ios
+        if: env.PLATFORM == 'ios'
+        continue-on-error: true
+        working-directory: ios-demo
+        run: |
+          xcodebuild build -project MyRadarSDKDemo.xcodeproj -scheme MyRadarSDKDemo \
+            -destination 'generic/platform=iOS Simulator' -quiet CODE_SIGNING_ALLOWED=NO
+
+      # ---------- Pull request ----------
+      - name: Pull request
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          BUILT: ${{ steps.android.outcome == 'success' || steps.ios.outcome == 'success' }}
+        run: |
+          if git diff --quiet; then echo "The $PLATFORM demo is already on $VERSION"; exit 0; fi
+          name=$([ "$PLATFORM" = ios ] && echo iOS || echo Android)
+          git config user.name "myradar-release[bot]"
+          git config user.email "myradar-release[bot]@users.noreply.github.com"
+          git checkout -q -b "$BRANCH"
+          git commit -q -am "$name demo: MyRadar SDK $VERSION"
+          git push -q -f origin "$BRANCH"
+          if [ "$BUILT" = true ]; then result="The $name demo builds against the published $VERSION release."
+          else result="**The $name demo does not build against $VERSION.** See $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID; this pull request stays open."; fi
+          body="Moves the $name demo to MyRadar $name SDK $VERSION, released just now.
+
+          $result
+
+          Opened by the sdk-update workflow."
+          url=$(gh pr list --head "$BRANCH" --state open --json url --jq '.[0].url')
+          [ -n "$url" ] || url=$(gh pr create --base main --head "$BRANCH" --title "$name demo: MyRadar SDK $VERSION" --body "$body")
+          echo "Pull request: $url"
+          if [ "$BUILT" = true ]; then
+            gh pr merge "$url" --merge --delete-branch
+          else
+            exit 1
+          fi
+
+      - name: Build result
+        if: env.DRY_RUN == 'true'
+        env:
+          BUILT: ${{ steps.android.outcome == 'success' || steps.ios.outcome == 'success' }}
+        run: |
+          git diff --stat
+          [ "$BUILT" = true ] || { echo "::error::the $PLATFORM demo does not build against $VERSION"; exit 1; }
