@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@myradar/controls": "^2.5.0",
-    "@myradar/mapbox": "^2.5.0",
+    "@myradar/mapbox": "^2.6.0",
     "mapbox-gl": "^3.32.0"
   },
   "devDependencies": {
