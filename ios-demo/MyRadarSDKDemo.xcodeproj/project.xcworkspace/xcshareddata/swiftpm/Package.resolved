@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/MyRadar/MyRadar-iOS-SDK-SPM",
       "state" : {
-        "revision" : "cde6e0fb3ad4f92c7558d766d0703dce3e0f589e",
-        "version" : "2.4.0"
+        "revision" : "84a2b2ac507f18dc3403bb3335fe0a847e6664cf",
+        "version" : "2.4.1"
       }
     }
   ],
