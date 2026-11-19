@@ -344,7 +344,7 @@
 			repositoryURL = "https://github.com/MyRadar/MyRadar-iOS-SDK-SPM";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.4.0;
+				minimumVersion = 2.4.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
